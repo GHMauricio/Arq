@@ -6,4 +6,4 @@ RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline
 COPY src ./src
 EXPOSE 8080
-
+ENTRYPOINT ["sh", "-c", "java -jar target/*.jar"]
