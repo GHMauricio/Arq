@@ -1,14 +1,10 @@
-FROM eclipse-temurin:25-jdk-alpine AS build
+FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline
 COPY src ./src
-RUN ./mvnw clean package -DskipTests
-
-FROM eclipse-temurin:25-jdk-alpine
-WORKDIR /app
-COPY --from=build /app/target/app.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+RUN MAVEN_OPTS="-Xmx512m" ./mvnw clean package -DskipTests
+EXPOSE 8081
+ENTRYPOINT ["sh", "-c", "java -jar target/*.jar"]
