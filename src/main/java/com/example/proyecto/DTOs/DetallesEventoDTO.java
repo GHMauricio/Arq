@@ -13,51 +13,5 @@ public class DetallesEventoDTO {
     private LocalTime horaInicio;
     private LocalTime horaFin;
 
-    public Long getIdDetalleEvento() {
-        return idDetalleEvento;
-    }
 
-    public void setIdDetalleEvento(Long idDetalleEvento) {
-        this.idDetalleEvento = idDetalleEvento;
-    }
-
-    public Long getIdEvento() {
-        return idEvento;
-    }
-
-    public void setIdEvento(Long idEvento) {
-        this.idEvento = idEvento;
-    }
-
-    public String getActividad() {
-        return actividad;
-    }
-
-    public void setActividad(String actividad) {
-        this.actividad = actividad;
-    }
-
-    public String getResponsable() {
-        return responsable;
-    }
-
-    public void setResponsable(String responsable) {
-        this.responsable = responsable;
-    }
-
-    public LocalTime getHoraInicio() {
-        return horaInicio;
-    }
-
-    public void setHoraInicio(LocalTime horaInicio) {
-        this.horaInicio = horaInicio;
-    }
-
-    public LocalTime getHoraFin() {
-        return horaFin;
-    }
-
-    public void setHoraFin(LocalTime horaFin) {
-        this.horaFin = horaFin;
-    }
 }
