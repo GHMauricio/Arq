@@ -2,51 +2,62 @@ package com.example.proyecto.DTOs;
 
 import lombok.Data;
 
+import java.time.LocalTime;
+
 @Data
-public class DetalleTestDTO {
-    private Long idDetalleTest;
-    private Long idTest;
-    private String pregunta;
-    private String respuesta;
-    private String observacion;
+public class DetallesEventoDTO {
+    private Long idDetalleEvento;
+    private Long idEvento;
+    private String actividad;
+    private String responsable;
+    private LocalTime horaInicio;
+    private LocalTime horaFin;
 
-    public Long getIdDetalleTest() {
-        return idDetalleTest;
+    public Long getIdDetalleEvento() {
+        return idDetalleEvento;
     }
 
-    public void setIdDetalleTest(Long idDetalleTest) {
-        this.idDetalleTest = idDetalleTest;
+    public void setIdDetalleEvento(Long idDetalleEvento) {
+        this.idDetalleEvento = idDetalleEvento;
     }
 
-    public Long getIdTest() {
-        return idTest;
+    public Long getIdEvento() {
+        return idEvento;
     }
 
-    public void setIdTest(Long idTest) {
-        this.idTest = idTest;
+    public void setIdEvento(Long idEvento) {
+        this.idEvento = idEvento;
     }
 
-    public String getPregunta() {
-        return pregunta;
+    public String getActividad() {
+        return actividad;
     }
 
-    public void setPregunta(String pregunta) {
-        this.pregunta = pregunta;
+    public void setActividad(String actividad) {
+        this.actividad = actividad;
     }
 
-    public String getRespuesta() {
-        return respuesta;
+    public String getResponsable() {
+        return responsable;
     }
 
-    public void setRespuesta(String respuesta) {
-        this.respuesta = respuesta;
+    public void setResponsable(String responsable) {
+        this.responsable = responsable;
     }
 
-    public String getObservacion() {
-        return observacion;
+    public LocalTime getHoraInicio() {
+        return horaInicio;
     }
 
-    public void setObservacion(String observacion) {
-        this.observacion = observacion;
+    public void setHoraInicio(LocalTime horaInicio) {
+        this.horaInicio = horaInicio;
+    }
+
+    public LocalTime getHoraFin() {
+        return horaFin;
+    }
+
+    public void setHoraFin(LocalTime horaFin) {
+        this.horaFin = horaFin;
     }
 }
