@@ -23,5 +23,43 @@ public class Notificacion {
     @JoinColumn(name = "idUsuario")
     private Usuario usuario;
 
+    public Long getIdNotificacion() {
+        return idNotificacion;
+    }
 
+    public void setIdNotificacion(Long idNotificacion) {
+        this.idNotificacion = idNotificacion;
+    }
+
+    public String getMensajeNotificacion() {
+        return mensajeNotificacion;
+    }
+
+    public void setMensajeNotificacion(String mensajeNotificacion) {
+        this.mensajeNotificacion = mensajeNotificacion;
+    }
+
+    public LocalDateTime getFechaEnvio() {
+        return fechaEnvio;
+    }
+
+    public void setFechaEnvio(LocalDateTime fechaEnvio) {
+        this.fechaEnvio = fechaEnvio;
+    }
+
+    public boolean isLeido() {
+        return leido;
+    }
+
+    public void setLeido(boolean leido) {
+        this.leido = leido;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 }
