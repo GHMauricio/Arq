@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Eventos-general")
+@RequestMapping("/DetallesEventos-general")
 @CrossOrigin(origins = "*")
 public class EventoController {
 
