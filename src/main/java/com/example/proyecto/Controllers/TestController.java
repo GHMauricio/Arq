@@ -100,7 +100,13 @@ public class TestController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public void eliminar(@PathVariable Long id) {
-        tS.eliminar(id);
+    public ResponseEntity<String> eliminar(@PathVariable Long id) {
+        try {
+            tS.eliminar(id);
+            return ResponseEntity.ok("Usuario eliminado correctamente con ID: " + id);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se pudo eliminar: " + e.getMessage());
+        }
     }
 }
