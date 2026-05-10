@@ -8,9 +8,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name="Usuarios")
+@Table(name = "Usuarios")
 @Data
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idUsuario;
@@ -18,7 +19,6 @@ public class Usuario {
     private String nombreUsuario;
     private String correoUsuario;
     private String contrasenaUsuario;
-    //private String rolUsuario;
     private LocalDate fechaRegistro;
     private Boolean enabled;
 
@@ -34,20 +34,16 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario")
     private List<ProgresoEmocional> progresos;
 
-    @OneToMany(mappedBy = "user", fetch =FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Role> rolUsuario;
+
     public List<Role> getRoles() { return rolUsuario; }
 
     public String getUsername() { return nombreUsuario; }
 
-    public void setUsername(String username) {
-        this.nombreUsuario = username;
-    }
+    public void setUsername(String username) { this.nombreUsuario = username; }
 
     public String getPassword() { return contrasenaUsuario; }
 
-    public void setPassword(String password) {
-        this.contrasenaUsuario = password;
-    }
-
+    public void setPassword(String password) { this.contrasenaUsuario = password; }
 }
