@@ -22,8 +22,21 @@ public class DetallesEventoController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> registrar(@RequestBody DetallesEvento detalle) {
-        deS.insertar(detalle);
-        return new ResponseEntity<>(detalle, HttpStatus.CREATED);
+        if (detalle.getActividad() == null || detalle.getActividad().isBlank()) {
+            return ResponseEntity.badRequest().body("La actividad es obligatoria");
+        }
+        if (detalle.getResponsable() == null || detalle.getResponsable().isBlank()) {
+            return ResponseEntity.badRequest().body("El responsable es obligatorio");
+        }
+        if (detalle.getHoraInicio() == null) {
+            return ResponseEntity.badRequest().body("La hora de inicio es obligatoria");
+        }
+        try {
+            deS.insertar(detalle);
+            return new ResponseEntity<>(detalle, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping
@@ -41,15 +54,27 @@ public class DetallesEventoController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody DetallesEvento detalle) {
-        deS.insertar(detalle);
-        return new ResponseEntity<>(detalle, HttpStatus.OK);
+        if (detalle.getActividad() == null || detalle.getActividad().isBlank()) {
+            return ResponseEntity.badRequest().body("La actividad es obligatoria");
+        }
+        if (detalle.getResponsable() == null || detalle.getResponsable().isBlank()) {
+            return ResponseEntity.badRequest().body("El responsable es obligatorio");
+        }
+        if (detalle.getHoraInicio() == null) {
+            return ResponseEntity.badRequest().body("La hora de inicio es obligatoria");
+        }
+        try {
+            deS.insertar(detalle);
+            return new ResponseEntity<>(detalle, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         deS.eliminar(id);
-        return ResponseEntity.ok("Progreso eliminado correctamente");
+        return ResponseEntity.ok("Detalle de evento con ID " + id + " eliminado correctamente");
     }
-
 }
