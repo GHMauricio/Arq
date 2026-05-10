@@ -74,12 +74,13 @@ public class UsuarioController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
+    public ResponseEntity<String> eliminarUsuario(@PathVariable Long id) {
         try {
             uS.eliminar(id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok("Usuario eliminado correctamente con ID: " + id);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se pudo eliminar: " + e.getMessage());
         }
     }
 
