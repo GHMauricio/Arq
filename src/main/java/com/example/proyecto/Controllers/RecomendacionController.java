@@ -1,7 +1,6 @@
 package com.example.proyecto.Controllers;
 
 import com.example.proyecto.DTOs.RecomendacionDTO;
-import com.example.proyecto.Entities.Recomendacion;
 import com.example.proyecto.Servicesinterfaces.IRecomendacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,8 +28,8 @@ public class RecomendacionController {
         if (recomendacion.getFechaEnvio().isAfter(LocalDate.now())) {
             return ResponseEntity.badRequest().body("La fecha de envío no puede ser futura");
         }
-        if (recomendacion.getIdRecomendacion() == null) {
-            return ResponseEntity.badRequest().body("El id de la recomendación no puede estar vacío");
+        if (recomendacion.getIdUsuario() == null) {
+            return ResponseEntity.badRequest().body("El id del usuario no puede estar vacío");
         }
 
         try {
@@ -43,32 +42,40 @@ public class RecomendacionController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public List<RecomendacionDTO> listar() {
-        return rS.listar();
+    public ResponseEntity<?> listar() {
+        try {
+            return ResponseEntity.ok(rS.listar());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @GetMapping("/Usuario/{idUsuario}")
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
-    public List<RecomendacionDTO> listarPorUsuario(@PathVariable Long idUsuario) {
-        return rS.listarPorUsuario(idUsuario);
+    public ResponseEntity<?> listarPorUsuario(@PathVariable Long idUsuario) {
+        try {
+            return ResponseEntity.ok(rS.listarPorUsuario(idUsuario));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody RecomendacionDTO recomendacion) {
+        if (recomendacion.getIdRecomendacion() == null) {
+            return ResponseEntity.badRequest().body("El id de la recomendación no puede estar vacío");
+        }
         if (recomendacion.getFechaEnvio() == null) {
             return ResponseEntity.badRequest().body("La fecha de envío no puede ser nula");
         }
         if (recomendacion.getFechaEnvio().isAfter(LocalDate.now())) {
             return ResponseEntity.badRequest().body("La fecha de envío no puede ser futura");
         }
-        if (recomendacion.getIdRecomendacion() == null) {
-            return ResponseEntity.badRequest().body("El id de la recomendación no puede estar vacío");
-        }
 
         try {
-            rS.insertar(recomendacion);
-            return new ResponseEntity<>("Recomendación actualizada correctamente", HttpStatus.OK);
+            rS.update(recomendacion);
+            return ResponseEntity.ok("Recomendación actualizada correctamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

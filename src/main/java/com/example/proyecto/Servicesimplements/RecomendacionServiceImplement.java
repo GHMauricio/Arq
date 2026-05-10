@@ -9,7 +9,6 @@ import com.example.proyecto.Servicesinterfaces.IRecomendacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,9 +27,8 @@ public class RecomendacionServiceImplement implements IRecomendacionService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Recomendacion r = new Recomendacion();
-        r.setIdRecomendacion(dto.getIdRecomendacion());
         r.setUsuario(usuario);
-        r.setFechaEnvio(dto.getFechaEnvio() != null ? dto.getFechaEnvio() : LocalDate.now());
+        r.setFechaEnvio(dto.getFechaEnvio());
         r.setEstadoRecomendacion(dto.getEstadoRecomendacion());
 
         rR.save(r);
@@ -52,20 +50,23 @@ public class RecomendacionServiceImplement implements IRecomendacionService {
 
     @Override
     public void eliminar(Long id) {
+        if (!rR.existsById(id)) {
+            throw new RuntimeException("Recomendación no encontrada con ID: " + id);
+        }
         rR.deleteById(id);
     }
 
     @Override
     public void update(RecomendacionDTO dto) {
         Recomendacion r = rR.findById(dto.getIdRecomendacion())
-                .orElseThrow(() -> new RuntimeException("Recomendación no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Recomendación no encontrada con ID: " + dto.getIdRecomendacion()));
 
         r.setFechaEnvio(dto.getFechaEnvio());
         r.setEstadoRecomendacion(dto.getEstadoRecomendacion());
 
         if (dto.getIdUsuario() != null) {
             Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + dto.getIdUsuario()));
             r.setUsuario(usuario);
         }
 
