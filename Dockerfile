@@ -5,6 +5,6 @@ COPY mvnw pom.xml ./
 RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline
 COPY src ./src
-RUN MAVEN_OPTS="-Xmx256m" ./mvnw clean package -DskipTests
+RUN MAVEN_OPTS="-Xmx512m" ./mvnw clean package -DskipTests
 EXPOSE 8081
 ENTRYPOINT ["sh", "-c", "java -jar target/*.jar"]
