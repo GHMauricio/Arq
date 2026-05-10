@@ -17,24 +17,21 @@ import java.util.List;
 @RequestMapping("/Tests-general")
 @CrossOrigin(origins = "*")
 public class TestController {
+
     @Autowired
     private ITestService tS;
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<String> registrar(@RequestBody TestDTO dto) {
-
         if (dto.getFechaTest() == null) {
-            return ResponseEntity.badRequest()
-                    .body("La fecha del test no puede ser nula");
+            return ResponseEntity.badRequest().body("La fecha del test no puede ser nula");
         }
         if (dto.getFechaTest().isAfter(LocalDate.now())) {
-            return ResponseEntity.badRequest()
-                    .body("La fecha del test no puede ser futura");
+            return ResponseEntity.badRequest().body("La fecha del test no puede ser futura");
         }
         if (dto.getPuntajeTest() == null || dto.getPuntajeTest() < 0.0 || dto.getPuntajeTest() > 20.0) {
-            return ResponseEntity.badRequest()
-                    .body("El puntaje debe estar entre 0 y 20");
+            return ResponseEntity.badRequest().body("El puntaje debe estar entre 0 y 20");
         }
 
         Test test = new Test();
@@ -48,14 +45,23 @@ public class TestController {
 
         tS.insertar(test);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Test registrado correctamente");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Test registrado correctamente");
     }
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public List<TestDTO> listar() {
         return tS.listar();
+    }
+
+    @GetMapping("/puntaje-ascendente")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    public ResponseEntity<?> listarPorPuntajeAscendente() {
+        List<TestDTO> lista = tS.listarPorPuntajeAscendente();
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay tests registrados");
+        }
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/Usuario/{idUsuario}")
@@ -68,16 +74,13 @@ public class TestController {
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> modificar(@RequestBody TestDTO dto) {
         if (dto.getFechaTest() == null) {
-            return ResponseEntity.badRequest()
-                    .body("La fecha del test no puede ser nula");
+            return ResponseEntity.badRequest().body("La fecha del test no puede ser nula");
         }
         if (dto.getFechaTest().isAfter(LocalDate.now())) {
-            return ResponseEntity.badRequest()
-                    .body("La fecha del test no puede ser futura");
+            return ResponseEntity.badRequest().body("La fecha del test no puede ser futura");
         }
         if (dto.getPuntajeTest() == null || dto.getPuntajeTest() < 0.0 || dto.getPuntajeTest() > 20.0) {
-            return ResponseEntity.badRequest()
-                    .body("El puntaje debe estar entre 0 y 20");
+            return ResponseEntity.badRequest().body("El puntaje debe estar entre 0 y 20");
         }
 
         Test test = new Test();
@@ -92,21 +95,19 @@ public class TestController {
         test.setNotasTest(dto.getNotasTest());
         test.setPuntajeTest(dto.getPuntajeTest());
 
-        tS.insertar(test); // o tS.update(test) si tienes un método específico
+        tS.insertar(test);
 
         return ResponseEntity.ok("Test actualizado correctamente");
     }
-
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         try {
             tS.eliminar(id);
-            return ResponseEntity.ok("Usuario eliminado correctamente con ID: " + id);
+            return ResponseEntity.ok("Test eliminado correctamente con ID: " + id);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("No se pudo eliminar: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se pudo eliminar: " + e.getMessage());
         }
     }
 }
