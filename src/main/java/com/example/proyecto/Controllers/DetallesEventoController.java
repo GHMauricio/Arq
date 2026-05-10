@@ -23,6 +23,19 @@ public class DetallesEventoController {
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> registrar(@RequestBody DetallesEvento detalle) {
         try {
+            if (detalle.getActividad() == null || detalle.getActividad().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La actividad del evento es obligatoria.");
+            }
+
+            if (detalle.getResponsable() == null || detalle.getResponsable().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("El responsable del evento es obligatorio.");
+            }
+
+            if (detalle.getHoraInicio() != null && detalle.getHoraFin() != null
+                    && !detalle.getHoraInicio().isBefore(detalle.getHoraFin())) {
+                return ResponseEntity.badRequest().body("La hora de inicio debe ser anterior a la hora de fin.");
+            }
+
             deS.insertar(detalle);
             return new ResponseEntity<>(detalle, HttpStatus.CREATED);
         } catch (RuntimeException e) {
@@ -46,6 +59,19 @@ public class DetallesEventoController {
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody DetallesEvento detalle) {
         try {
+            if (detalle.getIdDetalleEvento() == null) {
+                return ResponseEntity.badRequest().body("El ID del detalle es obligatorio para modificar.");
+            }
+
+            if (detalle.getActividad() == null || detalle.getActividad().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La actividad del evento es obligatoria.");
+            }
+
+            if (detalle.getHoraInicio() != null && detalle.getHoraFin() != null
+                    && !detalle.getHoraInicio().isBefore(detalle.getHoraFin())) {
+                return ResponseEntity.badRequest().body("La hora de inicio debe ser anterior a la hora de fin.");
+            }
+
             deS.insertar(detalle);
             return new ResponseEntity<>(detalle, HttpStatus.OK);
         } catch (RuntimeException e) {
@@ -58,9 +84,9 @@ public class DetallesEventoController {
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         try {
             deS.eliminar(id);
-            return ResponseEntity.ok("Detalle de evento con ID " + id + " eliminado correctamente");
+            return ResponseEntity.ok("El detalle de evento con ID " + id + " fue eliminado correctamente del sistema.");
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 }

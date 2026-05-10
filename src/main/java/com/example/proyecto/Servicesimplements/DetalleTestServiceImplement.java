@@ -9,24 +9,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 public class DetalleTestServiceImplement implements IDetalleTestService {
-
     @Autowired
     private DetalleTestRepository dtR;
 
     @Override
     public void insertar(DetallesTest detalle) {
-        if (detalle.getPregunta() == null || detalle.getPregunta().isBlank()) {
-            throw new RuntimeException("La pregunta es obligatoria");
-        }
-        if (detalle.getRespuesta() == null || detalle.getRespuesta().isBlank()) {
-            throw new RuntimeException("La respuesta es obligatoria");
-        }
-        if (detalle.getObservacion() == null || detalle.getObservacion().isBlank()) {
-            throw new RuntimeException("La observación es obligatoria");
-        }
         dtR.save(detalle);
     }
 
@@ -39,9 +28,9 @@ public class DetalleTestServiceImplement implements IDetalleTestService {
 
     @Override
     public void eliminar(Long id) {
-        if (dtR.existsById(id)) {
+        if(dtR.existsById(id)){
             dtR.deleteById(id);
-        } else {
+        }else{
             throw new RuntimeException("Este test no tiene detalles, intente con otro test");
         }
     }
