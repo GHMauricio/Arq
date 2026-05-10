@@ -7,26 +7,17 @@ import com.example.proyecto.Servicesinterfaces.IArticuloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class ArticuloServiceImplement implements IArticuloService {
-
     @Autowired
     private ArticuloRepository aR;
 
     @Override
     public void insertar(Articulos articulo) {
-        if (articulo.getTituloArticulo() == null || articulo.getTituloArticulo().isBlank()) {
-            throw new RuntimeException("El título del artículo es obligatorio");
-        }
-        if (articulo.getContenidoArticulo() == null || articulo.getContenidoArticulo().isBlank()) {
-            throw new RuntimeException("El contenido del artículo es obligatorio");
-        }
-        if (articulo.getAutorArticulo() == null || articulo.getAutorArticulo().isBlank()) {
-            throw new RuntimeException("El autor del artículo es obligatorio");
-        }
         aR.save(articulo);
     }
 
@@ -46,9 +37,9 @@ public class ArticuloServiceImplement implements IArticuloService {
 
     @Override
     public void eliminar(Long id) {
-        if (aR.existsById(id)) {
+        if(aR.existsById(id)){
             aR.deleteById(id);
-        } else {
+        }else{
             throw new RuntimeException("No se encuentra el articulo, verifique el identificador");
         }
     }
@@ -61,6 +52,7 @@ public class ArticuloServiceImplement implements IArticuloService {
         dto.setCategoriaArticulo(a.getCategoriaArticulo());
         dto.setFechaPublicacion(a.getFechaPublicacion());
         dto.setAutorArticulo(a.getAutorArticulo());
+
         if (a.getRecomendacion() != null) {
             dto.setIdRecomendacion(a.getRecomendacion().getIdRecomendacion());
         }
