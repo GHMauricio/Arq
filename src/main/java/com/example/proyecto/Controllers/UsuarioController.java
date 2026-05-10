@@ -80,7 +80,8 @@ public class UsuarioController {
             uS.eliminar(id);
             return ResponseEntity.ok("Usuario eliminado correctamente con ID: " + id);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se pudo eliminar: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se pudo eliminar: " + e.getMessage());
         }
     }
 

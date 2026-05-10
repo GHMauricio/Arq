@@ -57,8 +57,11 @@ public class ArticuloController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
-        aS.eliminar(id);
-        return ResponseEntity.ok("Progreso eliminado correctamente");
+        try {
+            aS.eliminar(id);
+            return ResponseEntity.ok("Artículo con ID " + id + " eliminado correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
-
 }

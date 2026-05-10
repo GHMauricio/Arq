@@ -23,16 +23,12 @@ public class TestServiceImplement implements ITestService {
 
     @Override
     public void insertar(Test test) {
-// Validación: El usuario debe existir en la BD
         if (!uR.existsById(test.getUsuario().getIdUsuario())) {
             throw new RuntimeException("No se puede registrar el test: El usuario no existe.");
         }
-
-        // Fecha automática si llega nula
         if (test.getFechaTest() == null) {
             test.setFechaTest(LocalDate.now());
         }
-
         tR.save(test);
     }
 
@@ -45,17 +41,23 @@ public class TestServiceImplement implements ITestService {
 
     @Override
     public List<TestDTO> listarPorUsuario(Long idUsuario) {
-        // Usamos el método que definimos en el Repository
         return tR.findByUsuarioIdUsuarioOrderByFechaTestDesc(idUsuario).stream()
                 .map(this::entityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
+    public List<TestDTO> listarPorPuntajeAscendente() {
+        return tR.listarPorPuntajeAscendente().stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void eliminar(Long id) {
-        if(tR.existsById(id)){
+        if (tR.existsById(id)) {
             tR.deleteById(id);
-        }else{
+        } else {
             throw new RuntimeException("No encontramos ese test, intente de nuevo");
         }
     }
@@ -67,7 +69,6 @@ public class TestServiceImplement implements ITestService {
         dto.setEstadoEmocional(t.getEstadoEmocional());
         dto.setNotasTest(t.getNotasTest());
         dto.setPuntajeTest(t.getPuntajeTest());
-
         if (t.getUsuario() != null) {
             dto.setIdUsuario(t.getUsuario().getIdUsuario());
         }

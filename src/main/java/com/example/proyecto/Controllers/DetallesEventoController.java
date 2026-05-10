@@ -22,8 +22,12 @@ public class DetallesEventoController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> registrar(@RequestBody DetallesEvento detalle) {
-        deS.insertar(detalle);
-        return new ResponseEntity<>(detalle, HttpStatus.CREATED);
+        try {
+            deS.insertar(detalle);
+            return new ResponseEntity<>(detalle, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping
@@ -41,15 +45,22 @@ public class DetallesEventoController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody DetallesEvento detalle) {
-        deS.insertar(detalle);
-        return new ResponseEntity<>(detalle, HttpStatus.OK);
+        try {
+            deS.insertar(detalle);
+            return new ResponseEntity<>(detalle, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
-        deS.eliminar(id);
-        return ResponseEntity.ok("Progreso eliminado correctamente");
+        try {
+            deS.eliminar(id);
+            return ResponseEntity.ok("Detalle de evento con ID " + id + " eliminado correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
-
 }
