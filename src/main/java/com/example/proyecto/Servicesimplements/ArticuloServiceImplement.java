@@ -2,7 +2,9 @@ package com.example.proyecto.Servicesimplements;
 
 import com.example.proyecto.DTOs.ArticuloDTO;
 import com.example.proyecto.Entities.Articulos;
+import com.example.proyecto.Entities.Recomendacion;
 import com.example.proyecto.Repositories.ArticuloRepository;
+import com.example.proyecto.Repositories.RecomendacionRepository;
 import com.example.proyecto.Servicesinterfaces.IArticuloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,17 +18,22 @@ public class ArticuloServiceImplement implements IArticuloService {
     @Autowired
     private ArticuloRepository aR;
 
+    @Autowired
+    private RecomendacionRepository rR;
+
     @Override
-    public void insertar(Articulos articulo) {
-        if (articulo.getTituloArticulo() == null || articulo.getTituloArticulo().isBlank()) {
-            throw new RuntimeException("El título del artículo es obligatorio");
-        }
-        if (articulo.getContenidoArticulo() == null || articulo.getContenidoArticulo().isBlank()) {
-            throw new RuntimeException("El contenido del artículo es obligatorio");
-        }
-        if (articulo.getAutorArticulo() == null || articulo.getAutorArticulo().isBlank()) {
-            throw new RuntimeException("El autor del artículo es obligatorio");
-        }
+    public void insertar(ArticuloDTO dto) {
+        Recomendacion recomendacion = rR.findById(dto.getIdRecomendacion())
+                .orElseThrow(() -> new RuntimeException("Recomendación no encontrada con ID: " + dto.getIdRecomendacion()));
+
+        Articulos articulo = new Articulos();
+        articulo.setTituloArticulo(dto.getTituloArticulo());
+        articulo.setContenidoArticulo(dto.getContenidoArticulo());
+        articulo.setCategoriaArticulo(dto.getCategoriaArticulo());
+        articulo.setFechaPublicacion(dto.getFechaPublicacion());
+        articulo.setAutorArticulo(dto.getAutorArticulo());
+        articulo.setRecomendacion(recomendacion);
+
         aR.save(articulo);
     }
 
@@ -40,6 +47,13 @@ public class ArticuloServiceImplement implements IArticuloService {
     @Override
     public List<ArticuloDTO> listarPorRecomendacion(Long idRecomendacion) {
         return aR.findByRecomendacionIdRecomendacion(idRecomendacion).stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ArticuloDTO> listarPorFechaPublicacionDescendente() {
+        return aR.listarPorFechaPublicacionDescendente().stream()
                 .map(this::entityToDto)
                 .collect(Collectors.toList());
     }
