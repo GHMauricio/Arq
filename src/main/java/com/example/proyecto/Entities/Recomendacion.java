@@ -52,7 +52,4 @@ public class Recomendacion {
         this.estadoRecomendacion = estadoRecomendacion;
     }
 
-    public String getMensajeNotificacion() {
-        return "";
-    }
 }
