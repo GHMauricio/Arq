@@ -32,16 +32,6 @@ public class EventoController {
         }
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody EventosDTO dto) {
-        try {
-            return ResponseEntity.ok(eS.actualizar(id, dto));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
     @GetMapping("/Usuario/{idUsuario}")
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public List<EventosDTO> listar(@PathVariable Long idUsuario) {
@@ -51,17 +41,7 @@ public class EventoController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
-        try {
-            eS.eliminar(id);
-            return ResponseEntity.ok("✅ El evento con ID " + id + " fue eliminado correctamente.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/por-anio")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public List<EventosDTO> listarPorAnio() {
-        return eS.listarPorAnioDescendente();
+        eS.eliminar(id);
+        return ResponseEntity.ok("Evento eliminado correctamente");
     }
 }

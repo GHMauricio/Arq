@@ -2,6 +2,7 @@ package com.example.proyecto.Servicesimplements;
 
 import com.example.proyecto.DTOs.TestDTO;
 import com.example.proyecto.Entities.Test;
+import com.example.proyecto.Entities.Usuario;
 import com.example.proyecto.Repositories.TestRepository;
 import com.example.proyecto.Repositories.UsuarioRepository;
 import com.example.proyecto.Servicesinterfaces.ITestService;
@@ -22,14 +23,37 @@ public class TestServiceImplement implements ITestService {
     private UsuarioRepository uR;
 
     @Override
-    public void insertar(Test test) {
-        if (!uR.existsById(test.getUsuario().getIdUsuario())) {
-            throw new RuntimeException("No se puede registrar el test: El usuario no existe.");
-        }
-        if (test.getFechaTest() == null) {
-            test.setFechaTest(LocalDate.now());
-        }
+    public void insertar(TestDTO dto) {
+        Usuario usuario = uR.findById(dto.getIdUsuario())
+                .orElseThrow(() -> new RuntimeException("No se puede registrar el test: El usuario no existe."));
+
+        Test test = new Test();
+        test.setUsuario(usuario);
+        test.setFechaTest(dto.getFechaTest() != null ? dto.getFechaTest() : LocalDate.now());
+        test.setEstadoEmocional(dto.getEstadoEmocional());
+        test.setNotasTest(dto.getNotasTest());
+        test.setPuntajeTest(dto.getPuntajeTest());
+
         tR.save(test);
+    }
+
+    @Override
+    public void update(TestDTO dto) {
+        Test existente = tR.findById(dto.getIdTest())
+                .orElseThrow(() -> new RuntimeException("Test no encontrado con ID: " + dto.getIdTest()));
+
+        existente.setFechaTest(dto.getFechaTest());
+        existente.setEstadoEmocional(dto.getEstadoEmocional());
+        existente.setNotasTest(dto.getNotasTest());
+        existente.setPuntajeTest(dto.getPuntajeTest());
+
+        if (dto.getIdUsuario() != null) {
+            Usuario usuario = uR.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + dto.getIdUsuario()));
+            existente.setUsuario(usuario);
+        }
+
+        tR.save(existente);
     }
 
     @Override

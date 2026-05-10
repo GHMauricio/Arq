@@ -33,20 +33,8 @@ public class ArticuloController {
         }
 
         try {
-            if (articulo.getTituloArticulo() == null || articulo.getTituloArticulo().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("El título del artículo es obligatorio.");
-            }
-
-            if (articulo.getContenidoArticulo() == null || articulo.getContenidoArticulo().length() < 10) {
-                return ResponseEntity.badRequest().body("El contenido del artículo debe tener al menos 10 caracteres.");
-            }
-
-            if (articulo.getFechaPublicacion() != null && articulo.getFechaPublicacion().isAfter(LocalDate.now())) {
-                return ResponseEntity.badRequest().body("La fecha de publicación no puede ser una fecha futura.");
-            }
-
-            aS.insertar(articulo);
-            return new ResponseEntity<>(articulo, HttpStatus.CREATED);
+            aS.insertar(dto);
+            return new ResponseEntity<>("Artículo creado exitosamente", HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -99,20 +87,8 @@ public class ArticuloController {
         }
 
         try {
-            if (articulo.getIdArticulo() == null) {
-                return ResponseEntity.badRequest().body("El ID del artículo es obligatorio para modificar.");
-            }
-
-            if (articulo.getAutorArticulo() == null || articulo.getAutorArticulo().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("El autor del artículo es obligatorio.");
-            }
-
-            if (articulo.getCategoriaArticulo() == null || articulo.getCategoriaArticulo().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La categoría del artículo es obligatoria.");
-            }
-
-            aS.insertar(articulo);
-            return new ResponseEntity<>(articulo, HttpStatus.OK);
+            aS.update(dto);
+            return ResponseEntity.ok("Artículo actualizado correctamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -121,6 +97,7 @@ public class ArticuloController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
+        // Solo el ADMINISTRADOR puede eliminar artículos del sistema
         try {
             aS.eliminar(id);
             return ResponseEntity.ok("El artículo con ID " + id + " fue eliminado correctamente del sistema.");
