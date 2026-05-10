@@ -2,6 +2,7 @@ package com.example.proyecto.Servicesimplements;
 
 import com.example.proyecto.DTOs.EventosDTO;
 import com.example.proyecto.Entities.Eventos;
+import com.example.proyecto.Entities.Usuario;
 import com.example.proyecto.Repositories.EventoRepository;
 import com.example.proyecto.Repositories.UsuarioRepository;
 import com.example.proyecto.Servicesinterfaces.IEventoService;
@@ -21,27 +22,30 @@ public class EventoServiceImplement implements IEventoService {
     private UsuarioRepository uR;
 
     @Override
-    public List<EventosDTO> listarEventosDTO() {
-        List<Eventos> lista = eR.findAll(); // Trae las entidades normales
-        // Aquí tendrías que usar un Stream o un bucle para pasar de Eventos a EventosDTO
-        return lista.stream().map(e -> new EventosDTO(
-                e.getIdEvento(), e.getTituloEvento(), e.getFechaInicio(), e.getFechaFin(), e.getDescripcionEvento(), e.getUsuario().getIdUsuario()
-        )).collect(Collectors.toList());
+    public void guardar(EventosDTO dto) {
+        Usuario usuario = uR.findById(dto.getIdUsuario())
+                .orElseThrow(() -> new RuntimeException("El usuario organizador no existe."));
+
+        if (dto.getFechaFin().isBefore(dto.getFechaInicio())) {
+            throw new RuntimeException("La fecha de fin no puede ser anterior a la de inicio.");
+        }
+
+        Eventos evento = new Eventos();
+        evento.setUsuario(usuario);
+        evento.setTituloEvento(dto.getTituloEvento());
+        evento.setDescripcionEvento(dto.getDescripcionEvento());
+        evento.setFechaInicio(dto.getFechaInicio());
+        evento.setFechaFin(dto.getFechaFin());
+        evento.setTipoEvento(dto.getTipoEvento());
+
+        eR.save(evento);
     }
 
     @Override
-    public Eventos guardar(Eventos evento) {
-        // 1. Validar Usuario
-        if (!uR.existsById(evento.getUsuario().getIdUsuario())) {
-            throw new RuntimeException("Error: El usuario organizador no existe.");
-        }
-
-        // 2. Validación de fechas (Lógica de negocio extra)
-        if (evento.getFechaFin().isBefore(evento.getFechaInicio())) {
-            throw new RuntimeException("Error: La fecha de fin no puede ser anterior a la de inicio.");
-        }
-
-        return eR.save(evento);
+    public List<EventosDTO> listarEventosDTO() {
+        return eR.findAll().stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -52,15 +56,19 @@ public class EventoServiceImplement implements IEventoService {
     }
 
     @Override
-    public void eliminar(Long id) {
-        eR.deleteById(id);
-    }
-
-    @Override
     public List<EventosDTO> listarTodo() {
         return eR.findAll().stream()
                 .map(this::entityToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        if (eR.existsById(id)) {
+            eR.deleteById(id);
+        } else {
+            throw new RuntimeException("Evento no encontrado con ID: " + id);
+        }
     }
 
     private EventosDTO entityToDto(Eventos e) {
@@ -75,6 +83,5 @@ public class EventoServiceImplement implements IEventoService {
             dto.setIdUsuario(e.getUsuario().getIdUsuario());
         }
         return dto;
-
     }
 }
