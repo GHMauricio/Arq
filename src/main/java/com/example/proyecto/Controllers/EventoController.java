@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -32,7 +32,7 @@ public class EventoController {
         if (dto.getTipoEvento() == null || dto.getTipoEvento().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("El tipo de evento no puede estar vacío.");
         }
-        if (dto.getFechaInicio().isAfter(LocalDateTime.now())) {
+        if (dto.getFechaInicio().isAfter(LocalDate.now())) {
             return ResponseEntity.badRequest().body("La fecha de inicio no puede ser en el futuro, ya que sería imposible realizarlo.");
         }
         try {
@@ -51,7 +51,7 @@ public class EventoController {
         if (dto.getTipoEvento() == null || dto.getTipoEvento().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("El tipo de evento no puede estar vacío.");
         }
-        if (dto.getFechaInicio().isAfter(LocalDateTime.now())) {
+        if (dto.getFechaInicio().isAfter(LocalDate.now())) {
             return ResponseEntity.badRequest().body("La fecha de inicio no puede ser en el futuro, ya que sería imposible realizarlo.");
         }
         try {
@@ -74,7 +74,7 @@ public class EventoController {
             eS.eliminar(id);
             return ResponseEntity.ok("El evento con ID " + id + " fue eliminado correctamente.");
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(" " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
