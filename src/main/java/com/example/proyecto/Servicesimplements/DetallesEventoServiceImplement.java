@@ -2,7 +2,9 @@ package com.example.proyecto.Servicesimplements;
 
 import com.example.proyecto.DTOs.DetallesEventoDTO;
 import com.example.proyecto.Entities.DetallesEvento;
+import com.example.proyecto.Entities.Eventos;
 import com.example.proyecto.Repositories.DetallesEventoRepository;
+import com.example.proyecto.Repositories.EventoRepository;
 import com.example.proyecto.Servicesinterfaces.IDetallesEventosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,42 +18,41 @@ public class DetallesEventoServiceImplement implements IDetallesEventosService {
     @Autowired
     private DetallesEventoRepository deR;
 
+    @Autowired
+    private EventoRepository eR;
+
     @Override
-    public void insertar(DetallesEvento detalle) {
-        if (detalle.getActividad() == null || detalle.getActividad().isBlank()) {
-            throw new RuntimeException("La actividad es obligatoria");
-        }
-        if (detalle.getResponsable() == null || detalle.getResponsable().isBlank()) {
-            throw new RuntimeException("El responsable es obligatorio");
-        }
-        if (detalle.getHoraInicio() == null) {
-            throw new RuntimeException("La hora de inicio es obligatoria");
-        }
+    public void insertar(DetallesEventoDTO dto) {
+        Eventos evento = eR.findById(dto.getIdEvento())
+                .orElseThrow(() -> new RuntimeException("Evento no encontrado con ID: " + dto.getIdEvento()));
+
+        DetallesEvento detalle = new DetallesEvento();
+        detalle.setEvento(evento);
+        detalle.setActividad(dto.getActividad());
+        detalle.setResponsable(dto.getResponsable());
+        detalle.setHoraInicio(dto.getHoraInicio());
+        detalle.setHoraFin(dto.getHoraFin());
+
         deR.save(detalle);
     }
 
     @Override
-    public List<DetallesEventoDTO> listarPorEvento(Long idEvento) {
-        return deR.findByEventoIdEvento(idEvento).stream()
-                .map(d -> {
-                    DetallesEventoDTO dto = new DetallesEventoDTO();
-                    dto.setIdDetalleEvento(d.getIdDetalleEvento());
-                    dto.setIdEvento(d.getEvento().getIdEvento());
-                    dto.setActividad(d.getActividad());
-                    dto.setResponsable(d.getResponsable());
-                    dto.setHoraInicio(d.getHoraInicio());
-                    dto.setHoraFin(d.getHoraFin());
-                    return dto;
-                }).collect(Collectors.toList());
-    }
+    public void update(DetallesEventoDTO dto) {
+        DetallesEvento existente = deR.findById(dto.getIdDetalleEvento())
+                .orElseThrow(() -> new RuntimeException("Detalle no encontrado con ID: " + dto.getIdDetalleEvento()));
 
-    @Override
-    public void eliminar(Long id) {
-        if (deR.existsById(id)) {
-            deR.deleteById(id);
-        } else {
-            throw new RuntimeException("Ingrese un id valido");
+        existente.setActividad(dto.getActividad());
+        existente.setResponsable(dto.getResponsable());
+        existente.setHoraInicio(dto.getHoraInicio());
+        existente.setHoraFin(dto.getHoraFin());
+
+        if (dto.getIdEvento() != null) {
+            Eventos evento = eR.findById(dto.getIdEvento())
+                    .orElseThrow(() -> new RuntimeException("Evento no encontrado con ID: " + dto.getIdEvento()));
+            existente.setEvento(evento);
         }
+
+        deR.save(existente);
     }
 
     @Override
@@ -59,6 +60,29 @@ public class DetallesEventoServiceImplement implements IDetallesEventosService {
         return deR.findAll().stream()
                 .map(this::entityToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DetallesEventoDTO> listarPorEvento(Long idEvento) {
+        return deR.findByEventoIdEvento(idEvento).stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DetallesEventoDTO> listarPorActividad(String actividad) {
+        return deR.listarPorActividad(actividad).stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        if (deR.existsById(id)) {
+            deR.deleteById(id);
+        } else {
+            throw new RuntimeException("Detalle de evento no encontrado con ID: " + id);
+        }
     }
 
     private DetallesEventoDTO entityToDto(DetallesEvento e) {
