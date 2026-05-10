@@ -132,6 +132,7 @@ public class UsuarioServiceImplement implements IUsuarioService {
     }
 
 
+
     @Override
     public List<UsuarioDTO> listar() {
         return uR.findAll().stream()
