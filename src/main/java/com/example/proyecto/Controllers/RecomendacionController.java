@@ -50,6 +50,16 @@ public class RecomendacionController {
         }
     }
 
+    @GetMapping("/fecha-descendente")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    public ResponseEntity<?> listarPorFechaDescendente() {
+        List<RecomendacionDTO> lista = rS.listarPorFechaDescendente();
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay recomendaciones registradas");
+        }
+        return ResponseEntity.ok(lista);
+    }
+
     @GetMapping("/Usuario/{idUsuario}")
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<?> listarPorUsuario(@PathVariable Long idUsuario) {
