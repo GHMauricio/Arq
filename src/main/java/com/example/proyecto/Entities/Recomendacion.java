@@ -51,4 +51,8 @@ public class Recomendacion {
     public void setEstadoRecomendacion(String estadoRecomendacion) {
         this.estadoRecomendacion = estadoRecomendacion;
     }
+
+    public String getMensajeNotificacion() {
+        return "";
+    }
 }
