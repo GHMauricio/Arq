@@ -9,6 +9,4 @@ public class DetalleTestDTO {
     private String pregunta;
     private String respuesta;
     private String observacion;
-
-
 }
