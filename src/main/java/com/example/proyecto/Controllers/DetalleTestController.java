@@ -32,20 +32,8 @@ public class DetalleTestController {
         }
 
         try {
-            if (detalle.getPregunta() == null || detalle.getPregunta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La pregunta del detalle es obligatoria.");
-            }
-
-            if (detalle.getRespuesta() == null || detalle.getRespuesta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La respuesta del detalle es obligatoria.");
-            }
-
-            if (detalle.getPregunta().length() > 255) {
-                return ResponseEntity.badRequest().body("La pregunta no puede exceder los 255 caracteres.");
-            }
-
-            dtS.insertar(detalle);
-            return new ResponseEntity<>(detalle, HttpStatus.CREATED);
+            dtS.insertar(dto);
+            return new ResponseEntity<>("Detalle de test registrado exitosamente", HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -96,20 +84,8 @@ public class DetalleTestController {
         }
 
         try {
-            if (detalle.getIdDetalleTest() == null) {
-                return ResponseEntity.badRequest().body("El ID del detalle es obligatorio para modificar.");
-            }
-
-            if (detalle.getPregunta() == null || detalle.getPregunta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La pregunta del detalle es obligatoria.");
-            }
-
-            if (detalle.getRespuesta() == null || detalle.getRespuesta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La respuesta del detalle es obligatoria.");
-            }
-
-            dtS.insertar(detalle);
-            return new ResponseEntity<>(detalle, HttpStatus.OK);
+            dtS.update(dto);
+            return ResponseEntity.ok("Detalle de test actualizado correctamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -118,6 +94,7 @@ public class DetalleTestController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
+        // Solo el ADMINISTRADOR puede eliminar detalles de test
         try {
             dtS.eliminar(id);
             return ResponseEntity.ok("El detalle de test con ID " + id + " fue eliminado correctamente del sistema.");
