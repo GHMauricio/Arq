@@ -9,12 +9,12 @@ import com.example.proyecto.Servicesinterfaces.IArticuloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class ArticuloServiceImplement implements IArticuloService {
+
     @Autowired
     private ArticuloRepository aR;
 
@@ -22,8 +22,39 @@ public class ArticuloServiceImplement implements IArticuloService {
     private RecomendacionRepository rR;
 
     @Override
-    public void insertar(Articulos articulo) {
+    public void insertar(ArticuloDTO dto) {
+        Recomendacion recomendacion = rR.findById(dto.getIdRecomendacion())
+                .orElseThrow(() -> new RuntimeException("Recomendación no encontrada con ID: " + dto.getIdRecomendacion()));
+
+        Articulos articulo = new Articulos();
+        articulo.setRecomendacion(recomendacion);
+        articulo.setTituloArticulo(dto.getTituloArticulo());
+        articulo.setContenidoArticulo(dto.getContenidoArticulo());
+        articulo.setCategoriaArticulo(dto.getCategoriaArticulo());
+        articulo.setFechaPublicacion(dto.getFechaPublicacion());
+        articulo.setAutorArticulo(dto.getAutorArticulo());
+
         aR.save(articulo);
+    }
+
+    @Override
+    public void update(ArticuloDTO dto) {
+        Articulos existente = aR.findById(dto.getIdArticulo())
+                .orElseThrow(() -> new RuntimeException("Artículo no encontrado con ID: " + dto.getIdArticulo()));
+
+        existente.setTituloArticulo(dto.getTituloArticulo());
+        existente.setContenidoArticulo(dto.getContenidoArticulo());
+        existente.setCategoriaArticulo(dto.getCategoriaArticulo());
+        existente.setFechaPublicacion(dto.getFechaPublicacion());
+        existente.setAutorArticulo(dto.getAutorArticulo());
+
+        if (dto.getIdRecomendacion() != null) {
+            Recomendacion recomendacion = rR.findById(dto.getIdRecomendacion())
+                    .orElseThrow(() -> new RuntimeException("Recomendación no encontrada con ID: " + dto.getIdRecomendacion()));
+            existente.setRecomendacion(recomendacion);
+        }
+
+        aR.save(existente);
     }
 
     @Override
@@ -49,10 +80,10 @@ public class ArticuloServiceImplement implements IArticuloService {
 
     @Override
     public void eliminar(Long id) {
-        if(aR.existsById(id)){
+        if (aR.existsById(id)) {
             aR.deleteById(id);
-        }else{
-            throw new RuntimeException("No se encuentra el articulo, verifique el identificador");
+        } else {
+            throw new RuntimeException("No se encuentra el artículo, verifique el identificador");
         }
     }
 
@@ -64,7 +95,6 @@ public class ArticuloServiceImplement implements IArticuloService {
         dto.setCategoriaArticulo(a.getCategoriaArticulo());
         dto.setFechaPublicacion(a.getFechaPublicacion());
         dto.setAutorArticulo(a.getAutorArticulo());
-
         if (a.getRecomendacion() != null) {
             dto.setIdRecomendacion(a.getRecomendacion().getIdRecomendacion());
         }
