@@ -2,7 +2,6 @@ package com.example.proyecto.Servicesimplements;
 
 import com.example.proyecto.DTOs.DetallesEventoDTO;
 import com.example.proyecto.Entities.DetallesEvento;
-import com.example.proyecto.Entities.Entrevista;
 import com.example.proyecto.Repositories.DetallesEventoRepository;
 import com.example.proyecto.Servicesinterfaces.IDetallesEventosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,15 @@ public class DetallesEventoServiceImplement implements IDetallesEventosService {
 
     @Override
     public void insertar(DetallesEvento detalle) {
+        if (detalle.getActividad() == null || detalle.getActividad().isBlank()) {
+            throw new RuntimeException("La actividad es obligatoria");
+        }
+        if (detalle.getResponsable() == null || detalle.getResponsable().isBlank()) {
+            throw new RuntimeException("El responsable es obligatorio");
+        }
+        if (detalle.getHoraInicio() == null) {
+            throw new RuntimeException("La hora de inicio es obligatoria");
+        }
         deR.save(detalle);
     }
 
@@ -39,9 +47,9 @@ public class DetallesEventoServiceImplement implements IDetallesEventosService {
 
     @Override
     public void eliminar(Long id) {
-        if(deR.existsById(id)){
+        if (deR.existsById(id)) {
             deR.deleteById(id);
-        }else{
+        } else {
             throw new RuntimeException("Ingrese un id valido");
         }
     }
@@ -53,7 +61,7 @@ public class DetallesEventoServiceImplement implements IDetallesEventosService {
                 .collect(Collectors.toList());
     }
 
-    private DetallesEventoDTO entityToDto(DetallesEvento e){
+    private DetallesEventoDTO entityToDto(DetallesEvento e) {
         DetallesEventoDTO dto = new DetallesEventoDTO();
         dto.setIdDetalleEvento(e.getIdDetalleEvento());
         dto.setActividad(e.getActividad());
