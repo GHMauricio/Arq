@@ -49,6 +49,13 @@ public class RecomendacionServiceImplement implements IRecomendacionService {
     }
 
     @Override
+    public List<RecomendacionDTO> listarPorFechaDescendente() {
+        return rR.listarPorFechaDescendente().stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void eliminar(Long id) {
         if (!rR.existsById(id)) {
             throw new RuntimeException("Recomendación no encontrada con ID: " + id);
