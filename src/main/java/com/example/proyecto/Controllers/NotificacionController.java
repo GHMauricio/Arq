@@ -9,7 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -49,6 +48,17 @@ public class NotificacionController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/leidas/{anio}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    public ResponseEntity<?> listarLeidasPorAnio(@PathVariable int anio) {
+        List<NotificacionDTO> leidas = nS.listarLeidasPorAnio(anio);
+        if (leidas.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No hay notificaciones leídas para el año: " + anio);
+        }
+        return ResponseEntity.ok(leidas);
     }
 
     @GetMapping("/Usuario/{idUsuario}")
