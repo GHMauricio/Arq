@@ -7,9 +7,11 @@ import com.example.proyecto.Entities.Usuario;
 import java.util.List;
 
 public interface IUsuarioService {
+
     void insertar(UsuarioRegistroDTO dto);
     void update(UsuarioRegistroDTO dto);
     List<UsuarioDTO> listar();
+    List<UsuarioDTO> listarPorNacimientoAdolescenteAscendente();
     void eliminar(Long idUsuario);
     UsuarioDTO listarId(Long idUsuario);
     List<Usuario> buscarPorIntereses(String intereses);
