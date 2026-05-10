@@ -1,7 +1,6 @@
 package com.example.proyecto.Controllers;
 
 import com.example.proyecto.DTOs.EntrevistaDTO;
-import com.example.proyecto.Entities.Entrevista;
 import com.example.proyecto.Servicesinterfaces.IEntrevistaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -22,20 +20,20 @@ public class EntrevistaController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> registrar(@RequestBody Entrevista entrevista) {
-        if (entrevista.getTemaEntrevista() == null || entrevista.getTemaEntrevista().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El tema de la entrevista es obligatorio.");
+    public ResponseEntity<?> registrar(@RequestBody EntrevistaDTO dto) {
+        if (dto.getFechaEntrevista() == null) {
+            return ResponseEntity.badRequest().body("La fecha de la entrevista no puede ser nula");
         }
-        if (entrevista.getComentarioEntrevista() == null || entrevista.getComentarioEntrevista().length() < 10) {
-            return ResponseEntity.badRequest().body("El comentario de la entrevista debe tener al menos 10 caracteres.");
+        if (dto.getTemaEntrevista() == null || dto.getTemaEntrevista().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("El tema de la entrevista no puede ser nulo o vacío");
         }
-        if (entrevista.getFechaEntrevista() != null && entrevista.getFechaEntrevista().isAfter(LocalDate.now())) {
-            return ResponseEntity.badRequest().body("La fecha de la entrevista no puede ser una fecha futura.");
+        if (dto.getIdRecomendacion() == null) {
+            return ResponseEntity.badRequest().body("El id de la recomendación no puede estar vacío");
         }
 
         try {
-            eS.insertar(entrevista);
-            return new ResponseEntity<>("Entrevista creada exitosamente", HttpStatus.CREATED);
+            eS.insertar(dto);
+            return new ResponseEntity<>("Entrevista registrada exitosamente", HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -61,24 +59,32 @@ public class EntrevistaController {
         }
     }
 
+    @GetMapping("/tema/{temaEntrevista}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    public ResponseEntity<?> listarPorTema(@PathVariable String temaEntrevista) {
+        List<EntrevistaDTO> lista = eS.listarPorTema(temaEntrevista);
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No hay entrevistas con el tema: " + temaEntrevista);
+        }
+        return ResponseEntity.ok(lista);
+    }
+
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> modificar(@RequestBody Entrevista entrevista) {
-        if (entrevista.getIdEntrevista() == null) {
-            return ResponseEntity.badRequest().body("El ID de la entrevista es obligatorio para modificar.");
+    public ResponseEntity<?> modificar(@RequestBody EntrevistaDTO dto) {
+        if (dto.getIdEntrevista() == null) {
+            return ResponseEntity.badRequest().body("El id de la entrevista no puede estar vacío");
         }
-        if (entrevista.getTemaEntrevista() == null || entrevista.getTemaEntrevista().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El tema de la entrevista es obligatorio.");
+        if (dto.getFechaEntrevista() == null) {
+            return ResponseEntity.badRequest().body("La fecha de la entrevista no puede ser nula");
         }
-        if (entrevista.getComentarioEntrevista() == null || entrevista.getComentarioEntrevista().length() < 10) {
-            return ResponseEntity.badRequest().body("El comentario de la entrevista debe tener al menos 10 caracteres.");
-        }
-        if (entrevista.getFechaEntrevista() != null && entrevista.getFechaEntrevista().isAfter(LocalDate.now())) {
-            return ResponseEntity.badRequest().body("La fecha de la entrevista no puede ser una fecha futura.");
+        if (dto.getTemaEntrevista() == null || dto.getTemaEntrevista().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("El tema de la entrevista no puede ser nulo o vacío");
         }
 
         try {
-            eS.insertar(entrevista);
+            eS.update(dto);
             return ResponseEntity.ok("Entrevista actualizada correctamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -88,6 +94,7 @@ public class EntrevistaController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
+        // Solo el ADMINISTRADOR puede eliminar entrevistas registradas
         try {
             eS.eliminar(id);
             return ResponseEntity.ok("Entrevista eliminada exitosamente con ID: " + id);
