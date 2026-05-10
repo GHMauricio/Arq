@@ -22,15 +22,6 @@ public class EntrevistaController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> registrar(@RequestBody Entrevista entrevista) {
-        if (entrevista.getFechaEntrevista() == null) {
-            return ResponseEntity.badRequest().body("La fecha de la entrevista es obligatoria");
-        }
-        if (entrevista.getTemaEntrevista() == null || entrevista.getTemaEntrevista().isBlank()) {
-            return ResponseEntity.badRequest().body("El tema de la entrevista es obligatorio");
-        }
-        if (entrevista.getComentarioEntrevista() == null || entrevista.getComentarioEntrevista().isBlank()) {
-            return ResponseEntity.badRequest().body("El comentario de la entrevista es obligatorio");
-        }
         try {
             eS.insertar(entrevista);
             return new ResponseEntity<>(entrevista, HttpStatus.CREATED);
@@ -54,15 +45,6 @@ public class EntrevistaController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody Entrevista entrevista) {
-        if (entrevista.getFechaEntrevista() == null) {
-            return ResponseEntity.badRequest().body("La fecha de la entrevista es obligatoria");
-        }
-        if (entrevista.getTemaEntrevista() == null || entrevista.getTemaEntrevista().isBlank()) {
-            return ResponseEntity.badRequest().body("El tema de la entrevista es obligatorio");
-        }
-        if (entrevista.getComentarioEntrevista() == null || entrevista.getComentarioEntrevista().isBlank()) {
-            return ResponseEntity.badRequest().body("El comentario de la entrevista es obligatorio");
-        }
         try {
             eS.insertar(entrevista);
             return new ResponseEntity<>(entrevista, HttpStatus.OK);
@@ -74,7 +56,11 @@ public class EntrevistaController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
-        eS.eliminar(id);
-        return ResponseEntity.ok("Entrevista con ID " + id + " eliminada correctamente");
+        try {
+            eS.eliminar(id);
+            return ResponseEntity.ok("Entrevista con ID " + id + " eliminada correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
