@@ -23,6 +23,15 @@ public class ArticuloController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> registrar(@RequestBody Articulos articulo) {
+        if (articulo.getTituloArticulo() == null || articulo.getTituloArticulo().isBlank()) {
+            return ResponseEntity.badRequest().body("El título del artículo es obligatorio");
+        }
+        if (articulo.getContenidoArticulo() == null || articulo.getContenidoArticulo().isBlank()) {
+            return ResponseEntity.badRequest().body("El contenido del artículo es obligatorio");
+        }
+        if (articulo.getAutorArticulo() == null || articulo.getAutorArticulo().isBlank()) {
+            return ResponseEntity.badRequest().body("El autor del artículo es obligatorio");
+        }
         try {
             aS.insertar(articulo);
             return new ResponseEntity<>(articulo, HttpStatus.CREATED);
@@ -46,6 +55,15 @@ public class ArticuloController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody Articulos articulo) {
+        if (articulo.getTituloArticulo() == null || articulo.getTituloArticulo().isBlank()) {
+            return ResponseEntity.badRequest().body("El título del artículo es obligatorio");
+        }
+        if (articulo.getContenidoArticulo() == null || articulo.getContenidoArticulo().isBlank()) {
+            return ResponseEntity.badRequest().body("El contenido del artículo es obligatorio");
+        }
+        if (articulo.getAutorArticulo() == null || articulo.getAutorArticulo().isBlank()) {
+            return ResponseEntity.badRequest().body("El autor del artículo es obligatorio");
+        }
         try {
             aS.insertar(articulo);
             return new ResponseEntity<>(articulo, HttpStatus.OK);
@@ -58,7 +76,6 @@ public class ArticuloController {
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         aS.eliminar(id);
-        return ResponseEntity.ok("Progreso eliminado correctamente");
+        return ResponseEntity.ok("Artículo con ID " + id + " eliminado correctamente");
     }
-
 }
