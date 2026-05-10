@@ -2,7 +2,7 @@ package com.example.proyecto.Servicesimplements;
 
 import com.example.proyecto.DTOs.RecomendacionDTO;
 import com.example.proyecto.Entities.Recomendacion;
-import com.example.proyecto.Repositories.ArticuloRepository;
+import com.example.proyecto.Entities.Usuario;
 import com.example.proyecto.Repositories.RecomendacionRepository;
 import com.example.proyecto.Repositories.UsuarioRepository;
 import com.example.proyecto.Servicesinterfaces.IRecomendacionService;
@@ -13,20 +13,27 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
-
 public class RecomendacionServiceImplement implements IRecomendacionService {
 
     @Autowired
     private RecomendacionRepository rR;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     @Override
-    public void insertar(Recomendacion recomendacion) {
-        if (recomendacion.getFechaEnvio() == null) {
-            recomendacion.setFechaEnvio(LocalDate.now());
-        }
-        rR.save(recomendacion);
+    public void insertar(RecomendacionDTO dto) {
+        Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Recomendacion r = new Recomendacion();
+        r.setIdRecomendacion(dto.getIdRecomendacion());
+        r.setUsuario(usuario);
+        r.setFechaEnvio(dto.getFechaEnvio() != null ? dto.getFechaEnvio() : LocalDate.now());
+        r.setEstadoRecomendacion(dto.getEstadoRecomendacion());
+
+        rR.save(r);
     }
 
     @Override
@@ -46,6 +53,23 @@ public class RecomendacionServiceImplement implements IRecomendacionService {
     @Override
     public void eliminar(Long id) {
         rR.deleteById(id);
+    }
+
+    @Override
+    public void update(RecomendacionDTO dto) {
+        Recomendacion r = rR.findById(dto.getIdRecomendacion())
+                .orElseThrow(() -> new RuntimeException("Recomendación no encontrada"));
+
+        r.setFechaEnvio(dto.getFechaEnvio());
+        r.setEstadoRecomendacion(dto.getEstadoRecomendacion());
+
+        if (dto.getIdUsuario() != null) {
+            Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            r.setUsuario(usuario);
+        }
+
+        rR.save(r);
     }
 
     private RecomendacionDTO entityToDto(Recomendacion r) {
