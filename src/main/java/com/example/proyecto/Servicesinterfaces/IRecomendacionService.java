@@ -9,6 +9,7 @@ public interface IRecomendacionService {
         void insertar(RecomendacionDTO dto);
         List<RecomendacionDTO> listar();
         List<RecomendacionDTO> listarPorUsuario(Long idUsuario);
+        List<RecomendacionDTO> listarPorFechaDescendente();
         void eliminar(Long id);
         void update(RecomendacionDTO dto);
 }
