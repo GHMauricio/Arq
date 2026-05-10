@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,6 +25,18 @@ public class ArticuloController {
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> registrar(@RequestBody Articulos articulo) {
         try {
+            if (articulo.getTituloArticulo() == null || articulo.getTituloArticulo().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("El título del artículo es obligatorio.");
+            }
+
+            if (articulo.getContenidoArticulo() == null || articulo.getContenidoArticulo().length() < 10) {
+                return ResponseEntity.badRequest().body("El contenido del artículo debe tener al menos 10 caracteres.");
+            }
+
+            if (articulo.getFechaPublicacion() != null && articulo.getFechaPublicacion().isAfter(LocalDate.now())) {
+                return ResponseEntity.badRequest().body("La fecha de publicación no puede ser una fecha futura.");
+            }
+
             aS.insertar(articulo);
             return new ResponseEntity<>(articulo, HttpStatus.CREATED);
         } catch (RuntimeException e) {
@@ -47,6 +60,18 @@ public class ArticuloController {
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody Articulos articulo) {
         try {
+            if (articulo.getIdArticulo() == null) {
+                return ResponseEntity.badRequest().body("El ID del artículo es obligatorio para modificar.");
+            }
+
+            if (articulo.getAutorArticulo() == null || articulo.getAutorArticulo().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("El autor del artículo es obligatorio.");
+            }
+
+            if (articulo.getCategoriaArticulo() == null || articulo.getCategoriaArticulo().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La categoría del artículo es obligatoria.");
+            }
+
             aS.insertar(articulo);
             return new ResponseEntity<>(articulo, HttpStatus.OK);
         } catch (RuntimeException e) {
@@ -59,9 +84,9 @@ public class ArticuloController {
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         try {
             aS.eliminar(id);
-            return ResponseEntity.ok("Artículo con ID " + id + " eliminado correctamente");
+            return ResponseEntity.ok("El artículo con ID " + id + " fue eliminado correctamente del sistema.");
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 }
