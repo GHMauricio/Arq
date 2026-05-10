@@ -1,7 +1,6 @@
 package com.example.proyecto.DTOs;
 
 import lombok.Data;
-
 import java.time.LocalDate;
 
 @Data
@@ -13,6 +12,4 @@ public class ArticuloDTO {
     private String categoriaArticulo;
     private LocalDate fechaPublicacion;
     private String autorArticulo;
-
-    
 }

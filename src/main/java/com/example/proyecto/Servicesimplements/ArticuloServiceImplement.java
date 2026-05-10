@@ -2,7 +2,9 @@ package com.example.proyecto.Servicesimplements;
 
 import com.example.proyecto.DTOs.ArticuloDTO;
 import com.example.proyecto.Entities.Articulos;
+import com.example.proyecto.Entities.Recomendacion;
 import com.example.proyecto.Repositories.ArticuloRepository;
+import com.example.proyecto.Repositories.RecomendacionRepository;
 import com.example.proyecto.Servicesinterfaces.IArticuloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,9 @@ import java.util.stream.Collectors;
 public class ArticuloServiceImplement implements IArticuloService {
     @Autowired
     private ArticuloRepository aR;
+
+    @Autowired
+    private RecomendacionRepository rR;
 
     @Override
     public void insertar(Articulos articulo) {
@@ -31,6 +36,13 @@ public class ArticuloServiceImplement implements IArticuloService {
     @Override
     public List<ArticuloDTO> listarPorRecomendacion(Long idRecomendacion) {
         return aR.findByRecomendacionIdRecomendacion(idRecomendacion).stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ArticuloDTO> listarPorFechaPublicacionDescendente() {
+        return aR.listarPorFechaPublicacionDescendente().stream()
                 .map(this::entityToDto)
                 .collect(Collectors.toList());
     }

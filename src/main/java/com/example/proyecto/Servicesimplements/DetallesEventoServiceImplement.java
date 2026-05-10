@@ -16,6 +16,9 @@ public class EntrevistaServiceImplement implements IEntrevistaService {
     @Autowired
     private EntrevistaRepository eR;
 
+    @Autowired
+    private EventoRepository eR;
+
     @Override
     public void insertar(Entrevista entrevista) {
         eR.save(entrevista);

@@ -1,7 +1,6 @@
 package com.example.proyecto.Servicesinterfaces;
 
 import com.example.proyecto.DTOs.ArticuloDTO;
-import com.example.proyecto.Entities.Articulos;
 
 import java.util.List;
 
