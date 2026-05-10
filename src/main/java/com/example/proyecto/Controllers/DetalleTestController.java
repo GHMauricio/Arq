@@ -15,14 +15,28 @@ import java.util.List;
 @RequestMapping("/DetalleTest-general")
 @CrossOrigin(origins = "*")
 public class DetalleTestController {
+
     @Autowired
     private IDetalleTestService dtS;
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
-    public ResponseEntity<?> registrar (@RequestBody DetallesTest detalle){
-        dtS.insertar(detalle);
-        return new ResponseEntity<>(detalle, HttpStatus.CREATED);
+    public ResponseEntity<?> registrar(@RequestBody DetallesTest detalle) {
+        if (detalle.getPregunta() == null || detalle.getPregunta().isBlank()) {
+            return ResponseEntity.badRequest().body("La pregunta es obligatoria");
+        }
+        if (detalle.getRespuesta() == null || detalle.getRespuesta().isBlank()) {
+            return ResponseEntity.badRequest().body("La respuesta es obligatoria");
+        }
+        if (detalle.getObservacion() == null || detalle.getObservacion().isBlank()) {
+            return ResponseEntity.badRequest().body("La observación es obligatoria");
+        }
+        try {
+            dtS.insertar(detalle);
+            return new ResponseEntity<>(detalle, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping
@@ -33,21 +47,34 @@ public class DetalleTestController {
 
     @GetMapping("/Test/{idTest}")
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
-    public List<DetalleTestDTO> listar(@PathVariable Long idTest){
+    public List<DetalleTestDTO> listar(@PathVariable Long idTest) {
         return dtS.listarPorTest(idTest);
     }
 
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody DetallesTest detalle) {
-        dtS.insertar(detalle); // El ID en el cuerpo asegura que sea un update
-        return new ResponseEntity<>(detalle, HttpStatus.OK);
+        if (detalle.getPregunta() == null || detalle.getPregunta().isBlank()) {
+            return ResponseEntity.badRequest().body("La pregunta es obligatoria");
+        }
+        if (detalle.getRespuesta() == null || detalle.getRespuesta().isBlank()) {
+            return ResponseEntity.badRequest().body("La respuesta es obligatoria");
+        }
+        if (detalle.getObservacion() == null || detalle.getObservacion().isBlank()) {
+            return ResponseEntity.badRequest().body("La observación es obligatoria");
+        }
+        try {
+            dtS.insertar(detalle);
+            return new ResponseEntity<>(detalle, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         dtS.eliminar(id);
-        return ResponseEntity.ok("Progreso eliminado correctamente");
+        return ResponseEntity.ok("Detalle de test con ID " + id + " eliminado correctamente");
     }
 }

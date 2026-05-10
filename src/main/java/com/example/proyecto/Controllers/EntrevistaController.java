@@ -15,19 +15,33 @@ import java.util.List;
 @RequestMapping("/Entrevista-general")
 @CrossOrigin(origins = "*")
 public class EntrevistaController {
+
     @Autowired
     private IEntrevistaService eS;
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> registrar(@RequestBody Entrevista entrevista){
-        eS.insertar(entrevista);
-        return new ResponseEntity<>(entrevista, HttpStatus.CREATED);
+    public ResponseEntity<?> registrar(@RequestBody Entrevista entrevista) {
+        if (entrevista.getFechaEntrevista() == null) {
+            return ResponseEntity.badRequest().body("La fecha de la entrevista es obligatoria");
+        }
+        if (entrevista.getTemaEntrevista() == null || entrevista.getTemaEntrevista().isBlank()) {
+            return ResponseEntity.badRequest().body("El tema de la entrevista es obligatorio");
+        }
+        if (entrevista.getComentarioEntrevista() == null || entrevista.getComentarioEntrevista().isBlank()) {
+            return ResponseEntity.badRequest().body("El comentario de la entrevista es obligatorio");
+        }
+        try {
+            eS.insertar(entrevista);
+            return new ResponseEntity<>(entrevista, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public List<EntrevistaDTO> listar(){
+    public List<EntrevistaDTO> listar() {
         return eS.listar();
     }
 
@@ -40,15 +54,27 @@ public class EntrevistaController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody Entrevista entrevista) {
-        eS.insertar(entrevista); // JPA detecta el ID y actualiza
-        return new ResponseEntity<>(entrevista, HttpStatus.OK);
+        if (entrevista.getFechaEntrevista() == null) {
+            return ResponseEntity.badRequest().body("La fecha de la entrevista es obligatoria");
+        }
+        if (entrevista.getTemaEntrevista() == null || entrevista.getTemaEntrevista().isBlank()) {
+            return ResponseEntity.badRequest().body("El tema de la entrevista es obligatorio");
+        }
+        if (entrevista.getComentarioEntrevista() == null || entrevista.getComentarioEntrevista().isBlank()) {
+            return ResponseEntity.badRequest().body("El comentario de la entrevista es obligatorio");
+        }
+        try {
+            eS.insertar(entrevista);
+            return new ResponseEntity<>(entrevista, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         eS.eliminar(id);
-        return ResponseEntity.ok("Progreso eliminado correctamente");
+        return ResponseEntity.ok("Entrevista con ID " + id + " eliminada correctamente");
     }
 }
-
