@@ -22,7 +22,8 @@ public class EventoServiceImplement implements IEventoService {
     private UsuarioRepository uR;
 
     @Override
-    public void guardar(EventosDTO dto) {
+    public EventosDTO guardar(EventosDTO dto) {
+
         Usuario usuario = uR.findById(dto.getIdUsuario())
                 .orElseThrow(() -> new RuntimeException("El usuario organizador no existe."));
 
@@ -31,6 +32,7 @@ public class EventoServiceImplement implements IEventoService {
         }
 
         Eventos evento = new Eventos();
+
         evento.setUsuario(usuario);
         evento.setTituloEvento(dto.getTituloEvento());
         evento.setDescripcionEvento(dto.getDescripcionEvento());
@@ -38,7 +40,9 @@ public class EventoServiceImplement implements IEventoService {
         evento.setFechaFin(dto.getFechaFin());
         evento.setTipoEvento(dto.getTipoEvento());
 
-        eR.save(evento);
+        Eventos eventoGuardado = eR.save(evento);
+
+        return entityToDto(eventoGuardado);
     }
 
     @Override
@@ -64,6 +68,7 @@ public class EventoServiceImplement implements IEventoService {
 
     @Override
     public void eliminar(Long id) {
+
         if (eR.existsById(id)) {
             eR.deleteById(id);
         } else {
@@ -72,16 +77,20 @@ public class EventoServiceImplement implements IEventoService {
     }
 
     private EventosDTO entityToDto(Eventos e) {
+
         EventosDTO dto = new EventosDTO();
+
         dto.setIdEvento(e.getIdEvento());
         dto.setTituloEvento(e.getTituloEvento());
         dto.setDescripcionEvento(e.getDescripcionEvento());
         dto.setFechaInicio(e.getFechaInicio());
         dto.setFechaFin(e.getFechaFin());
         dto.setTipoEvento(e.getTipoEvento());
+
         if (e.getUsuario() != null) {
             dto.setIdUsuario(e.getUsuario().getIdUsuario());
         }
+
         return dto;
     }
 }
