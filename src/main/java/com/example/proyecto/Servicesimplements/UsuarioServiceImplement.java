@@ -25,23 +25,20 @@ public class UsuarioServiceImplement implements IUsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private UsuarioDTO entityToDto(Usuario usuario){
+    private UsuarioDTO entityToDto(Usuario usuario) {
         UsuarioDTO dto = new UsuarioDTO();
         dto.setIdUsuario(usuario.getIdUsuario());
         dto.setCorreoUsuario(usuario.getCorreoUsuario());
         dto.setNombreUsuario(usuario.getNombreUsuario());
 
-        if(usuario.getRolUsuario() == null|| usuario.getRolUsuario().isEmpty()){
+        if (usuario.getRolUsuario() == null || usuario.getRolUsuario().isEmpty()) {
             dto.setRolUsuario("SIN_ROL_ASIGNADO");
-        }else {
-            // ✅ Convertir lista de roles a String separado por comas
-            if (usuario.getRolUsuario() != null) {
-                String roles = usuario.getRolUsuario()
-                        .stream()
-                        .map(role -> role.getRol()) // suponiendo que Role tiene getRol()
-                        .collect(Collectors.joining(","));
-                dto.setRolUsuario(roles);
-            }
+        } else {
+            String roles = usuario.getRolUsuario()
+                    .stream()
+                    .map(role -> role.getRol())
+                    .collect(Collectors.joining(","));
+            dto.setRolUsuario(roles);
         }
 
         dto.setFechaRegistro(usuario.getFechaRegistro());
@@ -59,12 +56,10 @@ public class UsuarioServiceImplement implements IUsuarioService {
         if (uR.findByCorreoUsuario(dto.getCorreoUsuario()) != null) {
             throw new RuntimeException("El correo ya está registrado.");
         }
-
         if (dto.getCantidadAdolescente() != null && dto.getCantidadAdolescente() < 0) {
             throw new RuntimeException("La cantidad de adolescentes no puede ser negativa.");
         }
 
-        // 2. MAPEO DE DTO A ENTIDAD
         Usuario u = new Usuario();
         u.setNombreUsuario(dto.getNombreUsuario());
         u.setCorreoUsuario(dto.getCorreoUsuario());
@@ -131,10 +126,16 @@ public class UsuarioServiceImplement implements IUsuarioService {
         uR.save(u);
     }
 
-
     @Override
     public List<UsuarioDTO> listar() {
         return uR.findAll().stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UsuarioDTO> listarPorNacimientoAdolescenteAscendente() {
+        return uR.listarPorNacimientoAdolescenteAscendente().stream()
                 .map(this::entityToDto)
                 .collect(Collectors.toList());
     }
