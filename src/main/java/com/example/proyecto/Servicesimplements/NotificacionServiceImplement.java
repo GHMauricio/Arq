@@ -2,18 +2,19 @@ package com.example.proyecto.Servicesimplements;
 
 import com.example.proyecto.DTOs.NotificacionDTO;
 import com.example.proyecto.Entities.Notificacion;
+import com.example.proyecto.Entities.Usuario;
 import com.example.proyecto.Repositories.NotificacionRepository;
 import com.example.proyecto.Repositories.UsuarioRepository;
 import com.example.proyecto.Servicesinterfaces.INotificacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class NotificacionServiceImplement  implements INotificacionService {
+public class NotificacionServiceImplement implements INotificacionService {
 
     @Autowired
     private NotificacionRepository nR;
@@ -22,18 +23,24 @@ public class NotificacionServiceImplement  implements INotificacionService {
     private UsuarioRepository uR;
 
     @Override
-    public Notificacion guardar(Notificacion notificacion) {
+    public void guardar(NotificacionDTO dto) {
+        Usuario usuario = uR.findById(dto.getIdUsuario())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + dto.getIdUsuario()));
 
-        // Validamos que el usuario exista antes de enviarle una notificación
-        if (!uR.existsById(notificacion.getUsuario().getIdUsuario())) {
-            throw new RuntimeException("No se puede crear la notificación: El usuario no existe.");
-        }
+        Notificacion notificacion = new Notificacion();
+        notificacion.setMensajeNotificacion(dto.getMensajeNotificacion());
+        notificacion.setFechaEnvio(dto.getFechaEnvio());
+        notificacion.setLeido(dto.isLeido());
+        notificacion.setUsuario(usuario);
 
-        // Asignamos la fecha y hora actual exacta si no viene en el JSON
-        if (notificacion.getFechaEnvio() == null) {
-            notificacion.setFechaEnvio(LocalDateTime.now());
-        }
-        return nR.save(notificacion);
+        nR.save(notificacion);
+    }
+
+    @Override
+    public List<NotificacionDTO> listar() {
+        return nR.findAll().stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -49,7 +56,28 @@ public class NotificacionServiceImplement  implements INotificacionService {
     }
 
     @Override
+    public void actualizar(Long id, NotificacionDTO dto) {
+        Notificacion existente = nR.findById(id)
+                .orElseThrow(() -> new RuntimeException("Notificación no encontrada con ID: " + id));
+
+        existente.setMensajeNotificacion(dto.getMensajeNotificacion());
+        existente.setFechaEnvio(dto.getFechaEnvio());
+        existente.setLeido(dto.isLeido());
+
+        if (dto.getIdUsuario() != null) {
+            Usuario usuario = uR.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + dto.getIdUsuario()));
+            existente.setUsuario(usuario);
+        }
+
+        nR.save(existente);
+    }
+
+    @Override
     public void eliminar(Long id) {
+        if (!nR.existsById(id)) {
+            throw new RuntimeException("Notificación no encontrada con ID: " + id);
+        }
         nR.deleteById(id);
     }
 
