@@ -5,12 +5,13 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface NotificacionRepository extends JpaRepository<Notificacion,Long> {
+public interface NotificacionRepository extends JpaRepository<Notificacion, Long> {
 
     List<Notificacion> findByUsuarioIdUsuarioOrderByFechaEnvioDesc(Long idUsuario);
 
@@ -18,4 +19,7 @@ public interface NotificacionRepository extends JpaRepository<Notificacion,Long>
     @Transactional
     @Query("UPDATE Notificacion n SET n.leido = true WHERE n.usuario.idUsuario = :idUsuario AND n.leido = false")
     void marcarComoLeido(Long idUsuario);
+
+    @Query("SELECT n FROM Notificacion n WHERE n.leido = true AND YEAR(n.fechaEnvio) = :anio")
+    List<Notificacion> listarLeidasPorAnio(@Param("anio") int anio);
 }

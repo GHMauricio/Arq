@@ -2,7 +2,8 @@ package com.example.proyecto.Entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDateTime;
+
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -14,7 +15,7 @@ public class Notificacion {
     private Long idNotificacion;
 
     private String mensajeNotificacion;
-    private LocalDateTime fechaEnvio;
+    private LocalDate fechaEnvio;
     private boolean leido = false;
 
     @ManyToOne

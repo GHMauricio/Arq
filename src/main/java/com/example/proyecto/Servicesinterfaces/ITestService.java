@@ -6,8 +6,10 @@ import com.example.proyecto.Entities.Test;
 import java.util.List;
 
 public interface ITestService {
-    public void insertar(Test test);
-    public List<TestDTO> listar();
-    public List<TestDTO> listarPorUsuario(Long idUsuario);
-    public void eliminar(Long id);
+
+    void insertar(Test test);
+    List<TestDTO> listar();
+    List<TestDTO> listarPorUsuario(Long idUsuario);
+    List<TestDTO> listarPorPuntajeAscendente();
+    void eliminar(Long id);
 }
