@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -46,7 +47,23 @@ public class UsuarioController {
 
     @PostMapping("/Registrar")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> registroUsuario(@Valid @RequestBody UsuarioRegistroDTO dto) {
+    public ResponseEntity<?> registroUsuario(@RequestBody UsuarioRegistroDTO dto) {
+        if (dto.getCorreoUsuario() == null || !dto.getCorreoUsuario().contains("@")) {
+            return ResponseEntity.badRequest()
+                    .body("El correo debe contener un '@'");
+        }
+
+        if (dto.getFechaRegistro() != null && dto.getFechaRegistro().isAfter(LocalDate.now())) {
+            return ResponseEntity.badRequest()
+                    .body("La fecha de registro no puede ser futura");
+        }
+
+        if (dto.getContrasenaUsuario() == null ||
+                !dto.getContrasenaUsuario().matches("^(?=.*[A-Za-z])(?=.*\\d).+$")) {
+            return ResponseEntity.badRequest()
+                    .body("La contraseña debe contener letras y números");
+        }
+
         try {
             uS.insertar(dto);
             return new ResponseEntity<>("Usuario registrado exitosamente", HttpStatus.CREATED);
@@ -63,6 +80,31 @@ public class UsuarioController {
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    public ResponseEntity<?> modificarUsuario(@PathVariable Long id, @RequestBody UsuarioRegistroDTO dto) {
+        if (dto.getCorreoUsuario() == null || !dto.getCorreoUsuario().contains("@")) {
+            return ResponseEntity.badRequest().body("El correo debe contener un '@'");
+        }
+
+        if (dto.getFechaRegistro() != null && dto.getFechaRegistro().isAfter(LocalDate.now())) {
+            return ResponseEntity.badRequest().body("La fecha de registro no puede ser futura");
+        }
+
+        if (dto.getContrasenaUsuario() == null ||
+                !dto.getContrasenaUsuario().matches("^(?=.*[A-Za-z])(?=.*\\d).+$")) {
+            return ResponseEntity.badRequest().body("La contraseña debe contener letras y números");
+        }
+
+        try {
+            dto.setIdUsuario(id);
+            uS.update(dto); // ← aquí estaba el flaw
+            return ResponseEntity.ok("Usuario actualizado correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
