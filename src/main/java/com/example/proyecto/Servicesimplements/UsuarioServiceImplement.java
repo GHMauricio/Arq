@@ -89,6 +89,50 @@ public class UsuarioServiceImplement implements IUsuarioService {
     }
 
     @Override
+    @Transactional
+    public void update(UsuarioRegistroDTO dto) {
+        Usuario u = uR.findById(dto.getIdUsuario())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + dto.getIdUsuario()));
+
+        u.setNombreUsuario(dto.getNombreUsuario());
+        u.setNacimientoUsuario(dto.getNacimientoUsuario());
+        u.setCantidadAdolescente(dto.getCantidadAdolescente());
+        u.setNacimientoAdolescente(dto.getNacimientoAdolescente());
+        u.setGeneroAdolescente(dto.getGeneroAdolescente());
+        u.setInteresesAdolescente(dto.getInteresesAdolescente());
+
+        if (dto.getCorreoUsuario() != null && !dto.getCorreoUsuario().equals(u.getCorreoUsuario())) {
+            Usuario existente = uR.findByCorreoUsuario(dto.getCorreoUsuario());
+            if (existente != null && !existente.getIdUsuario().equals(u.getIdUsuario())) {
+                throw new RuntimeException("El correo ya está registrado.");
+            }
+            u.setCorreoUsuario(dto.getCorreoUsuario());
+        }
+
+        if (dto.getContrasenaUsuario() != null && !dto.getContrasenaUsuario().isBlank()) {
+            u.setContrasenaUsuario(passwordEncoder.encode(dto.getContrasenaUsuario()));
+        }
+
+        if (dto.getFechaRegistro() != null) {
+            u.setFechaRegistro(dto.getFechaRegistro());
+        }
+
+        if (dto.getRolUsuario() != null && !dto.getRolUsuario().isBlank()) {
+            if (u.getRolUsuario() != null && !u.getRolUsuario().isEmpty()) {
+                u.getRolUsuario().get(0).setRol(dto.getRolUsuario());
+            } else {
+                Role rol = new Role();
+                rol.setRol(dto.getRolUsuario());
+                rol.setUser(u);
+                u.getRolUsuario().add(rol);
+            }
+        }
+
+        uR.save(u);
+    }
+
+
+    @Override
     public List<UsuarioDTO> listar() {
         return uR.findAll().stream()
                 .map(this::entityToDto)
