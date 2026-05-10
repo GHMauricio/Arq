@@ -1,8 +1,8 @@
 package com.example.proyecto.Controllers;
 
-import com.example.proyecto.DTOs.DetalleTestDTO;
-import com.example.proyecto.Entities.DetallesTest;
-import com.example.proyecto.Servicesinterfaces.IDetalleTestService;
+import com.example.proyecto.DTOs.DetallesEventoDTO;
+import com.example.proyecto.Entities.DetallesEvento;
+import com.example.proyecto.Servicesinterfaces.IDetallesEventosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,30 +12,31 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/DetalleTest-general")
+@RequestMapping("/DetallesEvento-general")
 @CrossOrigin(origins = "*")
-public class DetalleTestController {
+public class DetallesEventoController {
 
     @Autowired
-    private IDetalleTestService dtS;
+    private IDetallesEventosService deS;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
-    public ResponseEntity<?> registrar(@RequestBody DetallesTest detalle) {
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    public ResponseEntity<?> registrar(@RequestBody DetallesEvento detalle) {
         try {
-            if (detalle.getPregunta() == null || detalle.getPregunta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La pregunta del detalle es obligatoria.");
+            if (detalle.getActividad() == null || detalle.getActividad().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La actividad del evento es obligatoria.");
             }
 
-            if (detalle.getRespuesta() == null || detalle.getRespuesta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La respuesta del detalle es obligatoria.");
+            if (detalle.getResponsable() == null || detalle.getResponsable().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("El responsable del evento es obligatorio.");
             }
 
-            if (detalle.getPregunta().length() > 255) {
-                return ResponseEntity.badRequest().body("La pregunta no puede exceder los 255 caracteres.");
+            if (detalle.getHoraInicio() != null && detalle.getHoraFin() != null
+                    && !detalle.getHoraInicio().isBefore(detalle.getHoraFin())) {
+                return ResponseEntity.badRequest().body("La hora de inicio debe ser anterior a la hora de fin.");
             }
 
-            dtS.insertar(detalle);
+            deS.insertar(detalle);
             return new ResponseEntity<>(detalle, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -44,33 +45,34 @@ public class DetalleTestController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public List<DetalleTestDTO> listarTodo() {
-        return dtS.listar();
+    public List<DetallesEventoDTO> listar() {
+        return deS.listar();
     }
 
-    @GetMapping("/Test/{idTest}")
+    @GetMapping("/Evento/{idEvento}")
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
-    public List<DetalleTestDTO> listar(@PathVariable Long idTest) {
-        return dtS.listarPorTest(idTest);
+    public List<DetallesEventoDTO> listarPorEvento(@PathVariable Long idEvento) {
+        return deS.listarPorEvento(idEvento);
     }
 
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> modificar(@RequestBody DetallesTest detalle) {
+    public ResponseEntity<?> modificar(@RequestBody DetallesEvento detalle) {
         try {
-            if (detalle.getIdDetalleTest() == null) {
+            if (detalle.getIdDetalleEvento() == null) {
                 return ResponseEntity.badRequest().body("El ID del detalle es obligatorio para modificar.");
             }
 
-            if (detalle.getPregunta() == null || detalle.getPregunta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La pregunta del detalle es obligatoria.");
+            if (detalle.getActividad() == null || detalle.getActividad().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La actividad del evento es obligatoria.");
             }
 
-            if (detalle.getRespuesta() == null || detalle.getRespuesta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La respuesta del detalle es obligatoria.");
+            if (detalle.getHoraInicio() != null && detalle.getHoraFin() != null
+                    && !detalle.getHoraInicio().isBefore(detalle.getHoraFin())) {
+                return ResponseEntity.badRequest().body("La hora de inicio debe ser anterior a la hora de fin.");
             }
 
-            dtS.insertar(detalle);
+            deS.insertar(detalle);
             return new ResponseEntity<>(detalle, HttpStatus.OK);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -81,97 +83,8 @@ public class DetalleTestController {
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         try {
-            dtS.eliminar(id);
-            return ResponseEntity.ok("El detalle de test con ID " + id + " fue eliminado correctamente del sistema.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-}package com.example.proyecto.Controllers;
-
-import com.example.proyecto.DTOs.DetalleTestDTO;
-import com.example.proyecto.Entities.DetallesTest;
-import com.example.proyecto.Servicesinterfaces.IDetalleTestService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-@RestController
-@RequestMapping("/DetalleTest-general")
-@CrossOrigin(origins = "*")
-public class DetalleTestController {
-
-    @Autowired
-    private IDetalleTestService dtS;
-
-    @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
-    public ResponseEntity<?> registrar(@RequestBody DetallesTest detalle) {
-        try {
-            if (detalle.getPregunta() == null || detalle.getPregunta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La pregunta del detalle es obligatoria.");
-            }
-
-            if (detalle.getRespuesta() == null || detalle.getRespuesta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La respuesta del detalle es obligatoria.");
-            }
-
-            if (detalle.getPregunta().length() > 255) {
-                return ResponseEntity.badRequest().body("La pregunta no puede exceder los 255 caracteres.");
-            }
-
-            dtS.insertar(detalle);
-            return new ResponseEntity<>(detalle, HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @GetMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public List<DetalleTestDTO> listarTodo() {
-        return dtS.listar();
-    }
-
-    @GetMapping("/Test/{idTest}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
-    public List<DetalleTestDTO> listar(@PathVariable Long idTest) {
-        return dtS.listarPorTest(idTest);
-    }
-
-    @PutMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> modificar(@RequestBody DetallesTest detalle) {
-        try {
-            if (detalle.getIdDetalleTest() == null) {
-                return ResponseEntity.badRequest().body("El ID del detalle es obligatorio para modificar.");
-            }
-
-            if (detalle.getPregunta() == null || detalle.getPregunta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La pregunta del detalle es obligatoria.");
-            }
-
-            if (detalle.getRespuesta() == null || detalle.getRespuesta().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La respuesta del detalle es obligatoria.");
-            }
-
-            dtS.insertar(detalle);
-            return new ResponseEntity<>(detalle, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<String> eliminar(@PathVariable Long id) {
-        try {
-            dtS.eliminar(id);
-            return ResponseEntity.ok("El detalle de test con ID " + id + " fue eliminado correctamente del sistema.");
+            deS.eliminar(id);
+            return ResponseEntity.ok("El detalle de evento con ID " + id + " fue eliminado correctamente del sistema.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
