@@ -11,10 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 public class DetalleTestServiceImplement implements IDetalleTestService {
-
     @Autowired
     private DetalleTestRepository dtR;
 
@@ -22,16 +20,7 @@ public class DetalleTestServiceImplement implements IDetalleTestService {
     private TestRepository tR;
 
     @Override
-    public void insertar(DetalleTestDTO dto) {
-        Test test = tR.findById(dto.getIdTest())
-                .orElseThrow(() -> new RuntimeException("Test no encontrado con ID: " + dto.getIdTest()));
-
-        DetallesTest detalle = new DetallesTest();
-        detalle.setTest(test);
-        detalle.setPregunta(dto.getPregunta());
-        detalle.setRespuesta(dto.getRespuesta());
-        detalle.setObservacion(dto.getObservacion());
-
+    public void insertar(DetallesTest detalle) {
         dtR.save(detalle);
     }
 
@@ -76,9 +65,9 @@ public class DetalleTestServiceImplement implements IDetalleTestService {
 
     @Override
     public void eliminar(Long id) {
-        if (dtR.existsById(id)) {
+        if(dtR.existsById(id)){
             dtR.deleteById(id);
-        } else {
+        }else{
             throw new RuntimeException("Este test no tiene detalles, intente con otro test");
         }
     }

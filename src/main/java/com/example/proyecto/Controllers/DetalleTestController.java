@@ -32,8 +32,20 @@ public class DetalleTestController {
         }
 
         try {
-            dtS.insertar(dto);
-            return new ResponseEntity<>("Detalle de test registrado exitosamente", HttpStatus.CREATED);
+            if (detalle.getPregunta() == null || detalle.getPregunta().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La pregunta del detalle es obligatoria.");
+            }
+
+            if (detalle.getRespuesta() == null || detalle.getRespuesta().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La respuesta del detalle es obligatoria.");
+            }
+
+            if (detalle.getPregunta().length() > 255) {
+                return ResponseEntity.badRequest().body("La pregunta no puede exceder los 255 caracteres.");
+            }
+
+            dtS.insertar(detalle);
+            return new ResponseEntity<>(detalle, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -84,8 +96,20 @@ public class DetalleTestController {
         }
 
         try {
-            dtS.update(dto);
-            return ResponseEntity.ok("Detalle de test actualizado correctamente");
+            if (detalle.getIdDetalleTest() == null) {
+                return ResponseEntity.badRequest().body("El ID del detalle es obligatorio para modificar.");
+            }
+
+            if (detalle.getPregunta() == null || detalle.getPregunta().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La pregunta del detalle es obligatoria.");
+            }
+
+            if (detalle.getRespuesta() == null || detalle.getRespuesta().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La respuesta del detalle es obligatoria.");
+            }
+
+            dtS.insertar(detalle);
+            return new ResponseEntity<>(detalle, HttpStatus.OK);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -96,7 +120,7 @@ public class DetalleTestController {
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         try {
             dtS.eliminar(id);
-            return ResponseEntity.ok("Detalle de test eliminado exitosamente con ID: " + id);
+            return ResponseEntity.ok("El detalle de test con ID " + id + " fue eliminado correctamente del sistema.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }

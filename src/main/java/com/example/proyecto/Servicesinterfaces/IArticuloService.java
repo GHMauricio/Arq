@@ -5,10 +5,9 @@ import com.example.proyecto.DTOs.ArticuloDTO;
 import java.util.List;
 
 public interface IArticuloService {
+    public void insertar(Articulos articulo);
+    public List<ArticuloDTO> listar();
+    public List<ArticuloDTO> listarPorRecomendacion(Long idRecomendacion);
 
-    void insertar(ArticuloDTO dto);
-    List<ArticuloDTO> listar();
-    List<ArticuloDTO> listarPorRecomendacion(Long idRecomendacion);
-    List<ArticuloDTO> listarPorFechaPublicacionDescendente();
-    void eliminar(Long id);
+    public void eliminar(Long id);
 }
