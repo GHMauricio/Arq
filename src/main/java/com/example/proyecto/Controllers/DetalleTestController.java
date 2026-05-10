@@ -22,15 +22,6 @@ public class DetalleTestController {
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<?> registrar(@RequestBody DetallesTest detalle) {
-        if (detalle.getPregunta() == null || detalle.getPregunta().isBlank()) {
-            return ResponseEntity.badRequest().body("La pregunta es obligatoria");
-        }
-        if (detalle.getRespuesta() == null || detalle.getRespuesta().isBlank()) {
-            return ResponseEntity.badRequest().body("La respuesta es obligatoria");
-        }
-        if (detalle.getObservacion() == null || detalle.getObservacion().isBlank()) {
-            return ResponseEntity.badRequest().body("La observación es obligatoria");
-        }
         try {
             dtS.insertar(detalle);
             return new ResponseEntity<>(detalle, HttpStatus.CREATED);
@@ -54,15 +45,6 @@ public class DetalleTestController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody DetallesTest detalle) {
-        if (detalle.getPregunta() == null || detalle.getPregunta().isBlank()) {
-            return ResponseEntity.badRequest().body("La pregunta es obligatoria");
-        }
-        if (detalle.getRespuesta() == null || detalle.getRespuesta().isBlank()) {
-            return ResponseEntity.badRequest().body("La respuesta es obligatoria");
-        }
-        if (detalle.getObservacion() == null || detalle.getObservacion().isBlank()) {
-            return ResponseEntity.badRequest().body("La observación es obligatoria");
-        }
         try {
             dtS.insertar(detalle);
             return new ResponseEntity<>(detalle, HttpStatus.OK);
@@ -74,7 +56,11 @@ public class DetalleTestController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
-        dtS.eliminar(id);
-        return ResponseEntity.ok("Detalle de test con ID " + id + " eliminado correctamente");
+        try {
+            dtS.eliminar(id);
+            return ResponseEntity.ok("Detalle de test con ID " + id + " eliminado correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

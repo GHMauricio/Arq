@@ -9,6 +9,5 @@ public interface IArticuloService {
     public void insertar(Articulos articulo);
     public List<ArticuloDTO> listar();
     public List<ArticuloDTO> listarPorRecomendacion(Long idRecomendacion);
-
     public void eliminar(Long id);
 }

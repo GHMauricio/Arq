@@ -22,15 +22,6 @@ public class DetallesEventoController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> registrar(@RequestBody DetallesEvento detalle) {
-        if (detalle.getActividad() == null || detalle.getActividad().isBlank()) {
-            return ResponseEntity.badRequest().body("La actividad es obligatoria");
-        }
-        if (detalle.getResponsable() == null || detalle.getResponsable().isBlank()) {
-            return ResponseEntity.badRequest().body("El responsable es obligatorio");
-        }
-        if (detalle.getHoraInicio() == null) {
-            return ResponseEntity.badRequest().body("La hora de inicio es obligatoria");
-        }
         try {
             deS.insertar(detalle);
             return new ResponseEntity<>(detalle, HttpStatus.CREATED);
@@ -54,15 +45,6 @@ public class DetallesEventoController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody DetallesEvento detalle) {
-        if (detalle.getActividad() == null || detalle.getActividad().isBlank()) {
-            return ResponseEntity.badRequest().body("La actividad es obligatoria");
-        }
-        if (detalle.getResponsable() == null || detalle.getResponsable().isBlank()) {
-            return ResponseEntity.badRequest().body("El responsable es obligatorio");
-        }
-        if (detalle.getHoraInicio() == null) {
-            return ResponseEntity.badRequest().body("La hora de inicio es obligatoria");
-        }
         try {
             deS.insertar(detalle);
             return new ResponseEntity<>(detalle, HttpStatus.OK);
@@ -74,7 +56,11 @@ public class DetallesEventoController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
-        deS.eliminar(id);
-        return ResponseEntity.ok("Detalle de evento con ID " + id + " eliminado correctamente");
+        try {
+            deS.eliminar(id);
+            return ResponseEntity.ok("Detalle de evento con ID " + id + " eliminado correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
