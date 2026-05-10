@@ -45,7 +45,7 @@ public class TestController {
         test.setEstadoEmocional(dto.getEstadoEmocional());
         test.setNotasTest(dto.getNotasTest());
         test.setPuntajeTest(dto.getPuntajeTest());
-        
+
         tS.insertar(test);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -66,10 +66,37 @@ public class TestController {
 
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> modificar(@RequestBody Test test) {
-        tS.insertar(test); // Actualiza si el ID está presente
-        return new ResponseEntity<>(test, HttpStatus.OK);
+    public ResponseEntity<String> modificar(@RequestBody TestDTO dto) {
+        if (dto.getFechaTest() == null) {
+            return ResponseEntity.badRequest()
+                    .body("La fecha del test no puede ser nula");
+        }
+        if (dto.getFechaTest().isAfter(LocalDate.now())) {
+            return ResponseEntity.badRequest()
+                    .body("La fecha del test no puede ser futura");
+        }
+        if (dto.getPuntajeTest() == null || dto.getPuntajeTest() < 0.0 || dto.getPuntajeTest() > 20.0) {
+            return ResponseEntity.badRequest()
+                    .body("El puntaje debe estar entre 0 y 20");
+        }
+
+        Test test = new Test();
+        test.setIdTest(dto.getIdTest());
+
+        Usuario usuario = new Usuario();
+        usuario.setIdUsuario(dto.getIdUsuario());
+        test.setUsuario(usuario);
+
+        test.setFechaTest(dto.getFechaTest());
+        test.setEstadoEmocional(dto.getEstadoEmocional());
+        test.setNotasTest(dto.getNotasTest());
+        test.setPuntajeTest(dto.getPuntajeTest());
+
+        tS.insertar(test); // o tS.update(test) si tienes un método específico
+
+        return ResponseEntity.ok("Test actualizado correctamente");
     }
+
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
