@@ -22,15 +22,15 @@ public class RecomendacionController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> crear(@RequestBody Recomendacion recomendacion) {
+    public ResponseEntity<?> crear(@RequestBody RecomendacionDTO recomendacion) {
         if (recomendacion.getFechaEnvio() == null) {
             return ResponseEntity.badRequest().body("La fecha de envío no puede ser nula");
         }
         if (recomendacion.getFechaEnvio().isAfter(LocalDate.now())) {
             return ResponseEntity.badRequest().body("La fecha de envío no puede ser futura");
         }
-        if (recomendacion.getMensajeNotificacion() == null || recomendacion.getMensajeNotificacion().isBlank()) {
-            return ResponseEntity.badRequest().body("El mensaje de notificación no puede estar vacío");
+        if (recomendacion.getIdRecomendacion() == null) {
+            return ResponseEntity.badRequest().body("El id de la recomendación no puede estar vacío");
         }
 
         try {
@@ -55,15 +55,15 @@ public class RecomendacionController {
 
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> modificar(@RequestBody Recomendacion recomendacion) {
+    public ResponseEntity<?> modificar(@RequestBody RecomendacionDTO recomendacion) {
         if (recomendacion.getFechaEnvio() == null) {
             return ResponseEntity.badRequest().body("La fecha de envío no puede ser nula");
         }
         if (recomendacion.getFechaEnvio().isAfter(LocalDate.now())) {
             return ResponseEntity.badRequest().body("La fecha de envío no puede ser futura");
         }
-        if (recomendacion.getMensajeNotificacion() == null || recomendacion.getMensajeNotificacion().isBlank()) {
-            return ResponseEntity.badRequest().body("El mensaje de notificación no puede estar vacío");
+        if (recomendacion.getIdRecomendacion() == null) {
+            return ResponseEntity.badRequest().body("El id de la recomendación no puede estar vacío");
         }
 
         try {
