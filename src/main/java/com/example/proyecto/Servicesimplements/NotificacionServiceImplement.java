@@ -9,7 +9,6 @@ import com.example.proyecto.Servicesinterfaces.INotificacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +45,13 @@ public class NotificacionServiceImplement implements INotificacionService {
     @Override
     public List<NotificacionDTO> listarPorUsuario(Long idUsuario) {
         return nR.findByUsuarioIdUsuarioOrderByFechaEnvioDesc(idUsuario).stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<NotificacionDTO> listarLeidasPorAnio(int anio) {
+        return nR.listarLeidasPorAnio(anio).stream()
                 .map(this::entityToDto)
                 .collect(Collectors.toList());
     }
