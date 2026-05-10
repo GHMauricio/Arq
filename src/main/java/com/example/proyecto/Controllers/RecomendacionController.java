@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -22,9 +23,19 @@ public class RecomendacionController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> crear(@RequestBody Recomendacion recomendacion) {
+        if (recomendacion.getFechaEnvio() == null) {
+            return ResponseEntity.badRequest().body("La fecha de envío no puede ser nula");
+        }
+        if (recomendacion.getFechaEnvio().isAfter(LocalDate.now())) {
+            return ResponseEntity.badRequest().body("La fecha de envío no puede ser futura");
+        }
+        if (recomendacion.getMensajeNotificacion() == null || recomendacion.getMensajeNotificacion().isBlank()) {
+            return ResponseEntity.badRequest().body("El mensaje de notificación no puede estar vacío");
+        }
+
         try {
             rS.insertar(recomendacion);
-            return new ResponseEntity<>(recomendacion, HttpStatus.CREATED);
+            return new ResponseEntity<>("Recomendación creada exitosamente", HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -45,9 +56,19 @@ public class RecomendacionController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody Recomendacion recomendacion) {
+        if (recomendacion.getFechaEnvio() == null) {
+            return ResponseEntity.badRequest().body("La fecha de envío no puede ser nula");
+        }
+        if (recomendacion.getFechaEnvio().isAfter(LocalDate.now())) {
+            return ResponseEntity.badRequest().body("La fecha de envío no puede ser futura");
+        }
+        if (recomendacion.getMensajeNotificacion() == null || recomendacion.getMensajeNotificacion().isBlank()) {
+            return ResponseEntity.badRequest().body("El mensaje de notificación no puede estar vacío");
+        }
+
         try {
-            rS.insertar(recomendacion); // Usualmente el mismo método 'save' de JPA maneja el update si el ID existe
-            return new ResponseEntity<>(recomendacion, HttpStatus.OK);
+            rS.insertar(recomendacion);
+            return new ResponseEntity<>("Recomendación actualizada correctamente", HttpStatus.OK);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -56,9 +77,12 @@ public class RecomendacionController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
-        rS.eliminar(id);
-
-        return ResponseEntity.ok("Eliminado correctamente");
+        try {
+            rS.eliminar(id);
+            return ResponseEntity.ok("Recomendación eliminada correctamente con ID: " + id);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se pudo eliminar: " + e.getMessage());
+        }
     }
-
 }
