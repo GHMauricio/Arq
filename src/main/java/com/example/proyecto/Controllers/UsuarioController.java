@@ -2,9 +2,7 @@ package com.example.proyecto.Controllers;
 
 import com.example.proyecto.DTOs.UsuarioDTO;
 import com.example.proyecto.DTOs.UsuarioRegistroDTO;
-import com.example.proyecto.Entities.Usuario;
 import com.example.proyecto.Servicesinterfaces.IUsuarioService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("Usuarios-general")
-
 public class UsuarioController {
 
     @Autowired
@@ -24,13 +21,23 @@ public class UsuarioController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public List<UsuarioDTO> listar(){
+    public List<UsuarioDTO> listar() {
         return uS.listar();
     }
 
     @GetMapping("/usuarios-general")
     public ResponseEntity<String> getUsuariosGeneral() {
         return ResponseEntity.ok("Acceso concedido: lista de usuarios");
+    }
+
+    @GetMapping("/nacimiento-adolescente-ascendente")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    public ResponseEntity<?> listarPorNacimientoAdolescenteAscendente() {
+        List<UsuarioDTO> lista = uS.listarPorNacimientoAdolescenteAscendente();
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay usuarios registrados");
+        }
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/{id}")
@@ -44,24 +51,18 @@ public class UsuarioController {
         }
     }
 
-
     @PostMapping("/Registrar")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> registroUsuario(@RequestBody UsuarioRegistroDTO dto) {
         if (dto.getCorreoUsuario() == null || !dto.getCorreoUsuario().contains("@")) {
-            return ResponseEntity.badRequest()
-                    .body("El correo debe contener un '@'");
+            return ResponseEntity.badRequest().body("El correo debe contener un '@'");
         }
-
         if (dto.getFechaRegistro() != null && dto.getFechaRegistro().isAfter(LocalDate.now())) {
-            return ResponseEntity.badRequest()
-                    .body("La fecha de registro no puede ser futura");
+            return ResponseEntity.badRequest().body("La fecha de registro no puede ser futura");
         }
-
         if (dto.getContrasenaUsuario() == null ||
                 !dto.getContrasenaUsuario().matches("^(?=.*[A-Za-z])(?=.*\\d).+$")) {
-            return ResponseEntity.badRequest()
-                    .body("La contraseña debe contener letras y números");
+            return ResponseEntity.badRequest().body("La contraseña debe contener letras y números");
         }
 
         try {
@@ -74,12 +75,12 @@ public class UsuarioController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
+    public ResponseEntity<String> eliminarUsuario(@PathVariable Long id) {
         try {
             uS.eliminar(id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok("Usuario eliminado correctamente con ID: " + id);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se pudo eliminar: " + e.getMessage());
         }
     }
 
@@ -89,11 +90,9 @@ public class UsuarioController {
         if (dto.getCorreoUsuario() == null || !dto.getCorreoUsuario().contains("@")) {
             return ResponseEntity.badRequest().body("El correo debe contener un '@'");
         }
-
         if (dto.getFechaRegistro() != null && dto.getFechaRegistro().isAfter(LocalDate.now())) {
             return ResponseEntity.badRequest().body("La fecha de registro no puede ser futura");
         }
-
         if (dto.getContrasenaUsuario() == null ||
                 !dto.getContrasenaUsuario().matches("^(?=.*[A-Za-z])(?=.*\\d).+$")) {
             return ResponseEntity.badRequest().body("La contraseña debe contener letras y números");
@@ -101,11 +100,10 @@ public class UsuarioController {
 
         try {
             dto.setIdUsuario(id);
-            uS.update(dto); // ← aquí estaba el flaw
+            uS.update(dto);
             return ResponseEntity.ok("Usuario actualizado correctamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 }
