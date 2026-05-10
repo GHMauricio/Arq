@@ -5,7 +5,6 @@ COPY mvnw pom.xml ./
 RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline
 COPY src ./src
-COPY lombok.config ./
-RUN MAVEN_OPTS="-Xmx256m" ./mvnw clean package -DskipTests -Dlombok.addLombokGeneratedAnnotation=true
+RUN MAVEN_OPTS="-Xmx256m" ./mvnw clean package -DskipTests
 EXPOSE 8081
 ENTRYPOINT ["sh", "-c", "java -jar target/*.jar"]
