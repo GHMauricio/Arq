@@ -1,7 +1,6 @@
 package com.example.proyecto.Controllers;
 
 import com.example.proyecto.DTOs.EventosDTO;
-import com.example.proyecto.Entities.Eventos;
 import com.example.proyecto.Servicesinterfaces.IEventoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +14,7 @@ import java.util.List;
 @RequestMapping("/Eventos-general")
 @CrossOrigin(origins = "*")
 public class EventoController {
+
     @Autowired
     private IEventoService eS;
 
@@ -26,9 +26,9 @@ public class EventoController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> crear(@RequestBody Eventos evento) {
+    public ResponseEntity<?> crear(@RequestBody EventosDTO dto) {
         try {
-            return new ResponseEntity<>(eS.guardar(evento), HttpStatus.CREATED);
+            return new ResponseEntity<>(eS.guardar(dto), HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -44,6 +44,6 @@ public class EventoController {
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         eS.eliminar(id);
-        return ResponseEntity.ok("Progreso eliminado correctamente");
+        return ResponseEntity.ok("Evento eliminado correctamente");
     }
 }
