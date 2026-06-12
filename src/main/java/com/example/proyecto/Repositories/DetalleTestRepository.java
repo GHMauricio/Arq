@@ -15,4 +15,6 @@ public interface DetalleTestRepository extends JpaRepository<DetallesTest, Long>
 
     @Query("SELECT d FROM DetallesTest d WHERE d.respuesta = :respuesta")
     List<DetallesTest> listarPorRespuesta(@Param("respuesta") String respuesta);
+
+    void deleteByTestIdTest(Long idTest);
 }
