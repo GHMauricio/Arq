@@ -55,27 +55,29 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                .cors(cors -> {})
                 .csrf(AbstractHttpConfigurer::disable) // <-- Aquí quitamos "Requests"
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/login", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers("/usuarios/**").authenticated()
-                        .requestMatchers("/Progreso-general/**").authenticated()
-                        .requestMatchers("/Notificaciones/**").authenticated()
-                        .requestMatchers("/Eventos-general/").authenticated()
-                        .requestMatchers("/Recomendacion-general/**").authenticated()
-                        .requestMatchers("/Entrevista-general/**").authenticated()
-                        .requestMatchers("/Tests-general/**").authenticated()
-                        .requestMatchers("/Articulos-general/**").authenticated()
-                        .requestMatchers("/DetallesEvento-general/**").authenticated()
-                        .requestMatchers("/DetalleTest-general/**").authenticated()
-                        .anyRequest().authenticated()
+                        //.requestMatchers("/login", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        //.requestMatchers("/usuarios/**").authenticated()
+                        //.requestMatchers("/Progreso-general/**").authenticated()
+                        //.requestMatchers("/Notificaciones/**").authenticated()
+                        //.requestMatchers("/Eventos-general/").authenticated()
+                        //.requestMatchers("/Recomendacion-general/**").authenticated()
+                        //.requestMatchers("/Entrevista-general/**").authenticated()
+                        //.requestMatchers("/Tests-general/**").authenticated()
+                        //.requestMatchers("/Articulos-general/**").authenticated()
+                        //.requestMatchers("/DetallesEvento-general/**").authenticated()
+                        //.requestMatchers("/DetalleTest-general/**").authenticated()
+                        //.anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
-                .httpBasic(AbstractHttpConfigurer::disable) // <-- Aquí también
-                .formLogin(AbstractHttpConfigurer::disable) // <-- Y aquí
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        //httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 }

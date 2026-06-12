@@ -20,7 +20,7 @@ public class TestController {
     private ITestService tS;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<String> registrar(@RequestBody TestDTO dto) {
         if (dto.getFechaTest() == null) {
             return ResponseEntity.badRequest().body("La fecha del test no puede ser nula");
@@ -41,13 +41,13 @@ public class TestController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public List<TestDTO> listar() {
         return tS.listar();
     }
 
     @GetMapping("/puntaje-ascendente")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<?> listarPorPuntajeAscendente() {
         List<TestDTO> lista = tS.listarPorPuntajeAscendente();
         if (lista.isEmpty()) {
@@ -57,13 +57,13 @@ public class TestController {
     }
 
     @GetMapping("/Usuario/{idUsuario}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public List<TestDTO> listarPorUsuario(@PathVariable Long idUsuario) {
         return tS.listarPorUsuario(idUsuario);
     }
 
     @PutMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> modificar(@RequestBody TestDTO dto) {
         if (dto.getIdTest() == null) {
             return ResponseEntity.badRequest().body("El id del test no puede estar vacío");
@@ -87,7 +87,7 @@ public class TestController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         // Solo el ADMINISTRADOR puede eliminar tests del sistema
         try {
