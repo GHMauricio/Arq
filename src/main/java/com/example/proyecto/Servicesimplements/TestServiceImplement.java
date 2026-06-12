@@ -3,11 +3,13 @@ package com.example.proyecto.Servicesimplements;
 import com.example.proyecto.DTOs.TestDTO;
 import com.example.proyecto.Entities.Test;
 import com.example.proyecto.Entities.Usuario;
+import com.example.proyecto.Repositories.DetalleTestRepository;
 import com.example.proyecto.Repositories.TestRepository;
 import com.example.proyecto.Repositories.UsuarioRepository;
 import com.example.proyecto.Servicesinterfaces.ITestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +23,9 @@ public class TestServiceImplement implements ITestService {
 
     @Autowired
     private UsuarioRepository uR;
+
+    @Autowired
+    private DetalleTestRepository dtR;
 
     @Override
     public void insertar(TestDTO dto) {
@@ -78,11 +83,14 @@ public class TestServiceImplement implements ITestService {
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
         if (tR.existsById(id)) {
+            dtR.deleteByTestIdTest(id);
             tR.deleteById(id);
         } else {
             throw new RuntimeException("No encontramos ese test, intente de nuevo");
+
         }
     }
 
