@@ -25,11 +25,6 @@ public class UsuarioController {
         return uS.listar();
     }
 
-    @GetMapping("/usuarios-general")
-    public ResponseEntity<String> getUsuariosGeneral() {
-        return ResponseEntity.ok("Acceso concedido: lista de usuarios");
-    }
-
     @GetMapping("/nacimiento-adolescente-ascendente")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> listarPorNacimientoAdolescenteAscendente() {
@@ -73,18 +68,6 @@ public class UsuarioController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<String> eliminarUsuario(@PathVariable Long id) {
-        try {
-            uS.eliminar(id);
-            return ResponseEntity.ok("Usuario eliminado correctamente con ID: " + id);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("No se pudo eliminar: " + e.getMessage());
-        }
-    }
-
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificarUsuario(@PathVariable Long id, @RequestBody UsuarioRegistroDTO dto) {
@@ -105,6 +88,19 @@ public class UsuarioController {
             return ResponseEntity.ok("Usuario actualizado correctamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    public ResponseEntity<String> eliminarUsuario(@PathVariable Long id) {
+        // Solo el ADMINISTRADOR puede eliminar usuarios del sistema
+        try {
+            uS.eliminar(id);
+            return ResponseEntity.ok("Usuario eliminado correctamente con ID: " + id);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se pudo eliminar: " + e.getMessage());
         }
     }
 }

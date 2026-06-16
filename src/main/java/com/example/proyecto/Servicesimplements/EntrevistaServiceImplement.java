@@ -2,7 +2,9 @@ package com.example.proyecto.Servicesimplements;
 
 import com.example.proyecto.DTOs.EntrevistaDTO;
 import com.example.proyecto.Entities.Entrevista;
+import com.example.proyecto.Entities.Recomendacion;
 import com.example.proyecto.Repositories.EntrevistaRepository;
+import com.example.proyecto.Repositories.RecomendacionRepository;
 import com.example.proyecto.Servicesinterfaces.IEntrevistaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,18 +18,39 @@ public class EntrevistaServiceImplement implements IEntrevistaService {
     @Autowired
     private EntrevistaRepository eR;
 
+    @Autowired
+    private RecomendacionRepository rR;
+
     @Override
-    public void insertar(Entrevista entrevista) {
-        if (entrevista.getFechaEntrevista() == null) {
-            throw new RuntimeException("La fecha de la entrevista es obligatoria");
-        }
-        if (entrevista.getTemaEntrevista() == null || entrevista.getTemaEntrevista().isBlank()) {
-            throw new RuntimeException("El tema de la entrevista es obligatorio");
-        }
-        if (entrevista.getComentarioEntrevista() == null || entrevista.getComentarioEntrevista().isBlank()) {
-            throw new RuntimeException("El comentario de la entrevista es obligatorio");
-        }
+    public void insertar(EntrevistaDTO dto) {
+        Recomendacion recomendacion = rR.findById(dto.getIdRecomendacion())
+                .orElseThrow(() -> new RuntimeException("Recomendación no encontrada con ID: " + dto.getIdRecomendacion()));
+
+        Entrevista entrevista = new Entrevista();
+        entrevista.setRecomendacion(recomendacion);
+        entrevista.setFechaEntrevista(dto.getFechaEntrevista());
+        entrevista.setTemaEntrevista(dto.getTemaEntrevista());
+        entrevista.setComentarioEntrevista(dto.getComentarioEntrevista());
+
         eR.save(entrevista);
+    }
+
+    @Override
+    public void update(EntrevistaDTO dto) {
+        Entrevista existente = eR.findById(dto.getIdEntrevista())
+                .orElseThrow(() -> new RuntimeException("Entrevista no encontrada con ID: " + dto.getIdEntrevista()));
+
+        existente.setFechaEntrevista(dto.getFechaEntrevista());
+        existente.setTemaEntrevista(dto.getTemaEntrevista());
+        existente.setComentarioEntrevista(dto.getComentarioEntrevista());
+
+        if (dto.getIdRecomendacion() != null) {
+            Recomendacion recomendacion = rR.findById(dto.getIdRecomendacion())
+                    .orElseThrow(() -> new RuntimeException("Recomendación no encontrada con ID: " + dto.getIdRecomendacion()));
+            existente.setRecomendacion(recomendacion);
+        }
+
+        eR.save(existente);
     }
 
     @Override
@@ -45,11 +68,18 @@ public class EntrevistaServiceImplement implements IEntrevistaService {
     }
 
     @Override
+    public List<EntrevistaDTO> listarPorTema(String temaEntrevista) {
+        return eR.listarPorTema(temaEntrevista).stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void eliminar(Long id) {
         if (eR.existsById(id)) {
             eR.deleteById(id);
         } else {
-            throw new RuntimeException("No hay entrevista registrada con este id");
+            throw new RuntimeException("Entrevista no encontrada con ID: " + id);
         }
     }
 
@@ -59,6 +89,7 @@ public class EntrevistaServiceImplement implements IEntrevistaService {
         dto.setFechaEntrevista(e.getFechaEntrevista());
         dto.setTemaEntrevista(e.getTemaEntrevista());
         dto.setComentarioEntrevista(e.getComentarioEntrevista());
+
         if (e.getRecomendacion() != null) {
             dto.setIdRecomendacion(e.getRecomendacion().getIdRecomendacion());
         }

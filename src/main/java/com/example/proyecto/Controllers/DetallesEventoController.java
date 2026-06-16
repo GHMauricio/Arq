@@ -1,7 +1,6 @@
 package com.example.proyecto.Controllers;
 
 import com.example.proyecto.DTOs.DetallesEventoDTO;
-import com.example.proyecto.Entities.DetallesEvento;
 import com.example.proyecto.Servicesinterfaces.IDetallesEventosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,23 +20,20 @@ public class DetallesEventoController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> registrar(@RequestBody DetallesEvento detalle) {
+    public ResponseEntity<?> registrar(@RequestBody DetallesEventoDTO dto) {
+        if (dto.getActividad() == null || dto.getActividad().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("La actividad no puede ser nula o vacía");
+        }
+        if (dto.getResponsable() == null || dto.getResponsable().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("El responsable no puede ser nulo o vacío");
+        }
+        if (dto.getIdEvento() == null) {
+            return ResponseEntity.badRequest().body("El id del evento no puede estar vacío");
+        }
+
         try {
-            if (detalle.getActividad() == null || detalle.getActividad().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La actividad del evento es obligatoria.");
-            }
-
-            if (detalle.getResponsable() == null || detalle.getResponsable().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("El responsable del evento es obligatorio.");
-            }
-
-            if (detalle.getHoraInicio() != null && detalle.getHoraFin() != null
-                    && !detalle.getHoraInicio().isBefore(detalle.getHoraFin())) {
-                return ResponseEntity.badRequest().body("La hora de inicio debe ser anterior a la hora de fin.");
-            }
-
-            deS.insertar(detalle);
-            return new ResponseEntity<>(detalle, HttpStatus.CREATED);
+            deS.insertar(dto);
+            return new ResponseEntity<>("Detalle de evento registrado exitosamente", HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -45,35 +41,51 @@ public class DetallesEventoController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public List<DetallesEventoDTO> listar() {
-        return deS.listar();
+    public ResponseEntity<?> listar() {
+        try {
+            return ResponseEntity.ok(deS.listar());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @GetMapping("/Evento/{idEvento}")
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
-    public List<DetallesEventoDTO> listarPorEvento(@PathVariable Long idEvento) {
-        return deS.listarPorEvento(idEvento);
+    public ResponseEntity<?> listarPorEvento(@PathVariable Long idEvento) {
+        try {
+            return ResponseEntity.ok(deS.listarPorEvento(idEvento));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/actividad/{actividad}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    public ResponseEntity<?> listarPorActividad(@PathVariable String actividad) {
+        List<DetallesEventoDTO> lista = deS.listarPorActividad(actividad);
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No hay detalles con la actividad: " + actividad);
+        }
+        return ResponseEntity.ok(lista);
     }
 
     @PutMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> modificar(@RequestBody DetallesEvento detalle) {
+    public ResponseEntity<?> modificar(@RequestBody DetallesEventoDTO dto) {
+        if (dto.getIdDetalleEvento() == null) {
+            return ResponseEntity.badRequest().body("El id del detalle no puede estar vacío");
+        }
+        if (dto.getActividad() == null || dto.getActividad().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("La actividad no puede ser nula o vacía");
+        }
+        if (dto.getResponsable() == null || dto.getResponsable().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("El responsable no puede ser nulo o vacío");
+        }
+
         try {
-            if (detalle.getIdDetalleEvento() == null) {
-                return ResponseEntity.badRequest().body("El ID del detalle es obligatorio para modificar.");
-            }
-
-            if (detalle.getActividad() == null || detalle.getActividad().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("La actividad del evento es obligatoria.");
-            }
-
-            if (detalle.getHoraInicio() != null && detalle.getHoraFin() != null
-                    && !detalle.getHoraInicio().isBefore(detalle.getHoraFin())) {
-                return ResponseEntity.badRequest().body("La hora de inicio debe ser anterior a la hora de fin.");
-            }
-
-            deS.insertar(detalle);
-            return new ResponseEntity<>(detalle, HttpStatus.OK);
+            deS.update(dto);
+            return ResponseEntity.ok("Detalle de evento actualizado correctamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -84,7 +96,7 @@ public class DetallesEventoController {
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         try {
             deS.eliminar(id);
-            return ResponseEntity.ok("El detalle de evento con ID " + id + " fue eliminado correctamente del sistema.");
+            return ResponseEntity.ok("Detalle de evento eliminado exitosamente con ID: " + id);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }

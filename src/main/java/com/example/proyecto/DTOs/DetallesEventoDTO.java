@@ -12,6 +12,4 @@ public class DetallesEventoDTO {
     private String responsable;
     private LocalTime horaInicio;
     private LocalTime horaFin;
-
-
 }
