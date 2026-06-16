@@ -13,14 +13,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("Usuarios-general")
-@CrossOrigin(origins = "*")
+@RequestMapping("/usuarios-general")
 public class UsuarioController {
 
     @Autowired
     private IUsuarioService uS;
 
-    @GetMapping
+    @GetMapping("/listar")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public List<UsuarioDTO> listar() {
         return uS.listar();
