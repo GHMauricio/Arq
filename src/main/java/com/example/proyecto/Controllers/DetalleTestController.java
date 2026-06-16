@@ -19,7 +19,7 @@ public class DetalleTestController {
     private IDetalleTestService dtS;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<?> registrar(@RequestBody DetalleTestDTO dto) {
         if (dto.getPregunta() == null || dto.getPregunta().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("La pregunta no puede ser nula o vacía");
@@ -40,7 +40,7 @@ public class DetalleTestController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> listarTodo() {
         try {
             return ResponseEntity.ok(dtS.listar());
@@ -50,7 +50,7 @@ public class DetalleTestController {
     }
 
     @GetMapping("/Test/{idTest}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<?> listarPorTest(@PathVariable Long idTest) {
         try {
             return ResponseEntity.ok(dtS.listarPorTest(idTest));
@@ -60,7 +60,7 @@ public class DetalleTestController {
     }
 
     @GetMapping("/respuesta/{respuesta}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<?> listarPorRespuesta(@PathVariable String respuesta) {
         List<DetalleTestDTO> lista = dtS.listarPorRespuesta(respuesta);
         if (lista.isEmpty()) {
@@ -71,7 +71,7 @@ public class DetalleTestController {
     }
 
     @PutMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody DetalleTestDTO dto) {
         if (dto.getIdDetalleTest() == null) {
             return ResponseEntity.badRequest().body("El id del detalle no puede estar vacío");
@@ -92,7 +92,7 @@ public class DetalleTestController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminar(@PathVariable Long id) {
         // Solo el ADMINISTRADOR puede eliminar detalles de test
         try {
