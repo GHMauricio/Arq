@@ -39,7 +39,7 @@ public class EntrevistaController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/listar")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> listar() {
         try {
@@ -49,6 +49,17 @@ public class EntrevistaController {
         }
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    public ResponseEntity<EntrevistaDTO> obtenerEntrevista(@PathVariable("id") Long id) {
+        try {
+            EntrevistaDTO dto = eS.listarId(id);
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
     @GetMapping("/Recomendacion/{idRecomendacion}")
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<?> listarPorRecomendacion(@PathVariable Long idRecomendacion) {
