@@ -11,4 +11,5 @@ public interface IEntrevistaService {
     List<EntrevistaDTO> listarPorRecomendacion(Long idRecomendacion);
     List<EntrevistaDTO> listarPorTema(String temaEntrevista);
     void eliminar(Long id);
+    EntrevistaDTO listarId(Long idEntrevista);
 }
