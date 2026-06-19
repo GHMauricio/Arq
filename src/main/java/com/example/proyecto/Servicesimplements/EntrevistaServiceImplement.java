@@ -61,6 +61,13 @@ public class EntrevistaServiceImplement implements IEntrevistaService {
     }
 
     @Override
+    public List<EntrevistaDTO> listar() {
+        return eR.findAll().stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
     public List<EntrevistaDTO> listarPorRecomendacion(Long idRecomendacion) {
         return eR.findByRecomendacionIdRecomendacion(idRecomendacion).stream()
                 .map(this::entityToDto)
