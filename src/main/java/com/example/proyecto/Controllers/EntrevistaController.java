@@ -18,7 +18,7 @@ public class EntrevistaController {
     @Autowired
     private IEntrevistaService eS;
 
-    @PostMapping
+    @PostMapping("/registrar")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> registrar(@RequestBody EntrevistaDTO dto) {
         if (dto.getFechaEntrevista() == null) {
