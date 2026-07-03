@@ -61,10 +61,10 @@ public class EntrevistaServiceImplement implements IEntrevistaService {
     }
 
     @Override
-    public List<EntrevistaDTO> listar() {
-        return eR.findAll().stream()
+    public EntrevistaDTO listarId(Long idEntrevista) {
+        return eR.findById(idEntrevista)
                 .map(this::entityToDto)
-                .collect(Collectors.toList());
+                .orElse(null);
     }
     
     @Override
