@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,71 +16,89 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
-public class JwtTokenUtil {
+public class JwtTokenUtil{
+
 
     private static final long TOKEN_VALIDITY = 5 * 60 * 60 * 1000; // 5 horas
 
     @Value("${jwt.secret}")
     private String secret;
 
-    // Obtener el username (correo) desde el token
     public String getUsernameFromToken(String token) {
         return getClaim(token, Claims::getSubject);
     }
 
-    // Obtener fecha de expiración
     public Date getExpirationDate(String token) {
         return getClaim(token, Claims::getExpiration);
     }
 
-    // Resolver cualquier claim
-    public <T> T getClaim(String token, Function<Claims, T> resolver) {
+    public <T> T getClaim(
+            String token,
+            Function<Claims, T> resolver
+    ) {
         return resolver.apply(getAllClaims(token));
     }
 
-    // Extraer todos los claims usando la misma clave
     private Claims getAllClaims(String token) {
-        System.out.println("Secret en uso: " + secret);
-        return Jwts.parserBuilder()
-                .setSigningKey(secret.getBytes(StandardCharsets.UTF_8))
+        return Jwts.parser()
+                .setSigningKey(secret)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 
-    // Verificar expiración
     private boolean isExpired(String token) {
-        return getExpirationDate(token).before(new Date());
+        return getExpirationDate(token)
+                .before(new Date());
     }
 
-    // Generar token
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", userDetails.getAuthorities()
-                .stream()
-                .map(auth -> auth.getAuthority())
-                .collect(Collectors.joining(",")));
 
-        return createToken(claims, userDetails.getUsername());
+        Map<String, Object> claims = new HashMap<>();
+
+        claims.put(
+                "roles",
+                userDetails.getAuthorities()
+                        .stream()
+                        .map(auth -> auth.getAuthority())
+                        .collect(Collectors.joining(","))
+        );
+
+        return createToken(
+                claims,
+                userDetails.getUsername()
+        );
     }
 
-    // Crear token con HS512 y clave en texto plano
-    private String createToken(Map<String, Object> claims, String username) {
+    private String createToken(
+            Map<String, Object> claims,
+            String username
+    ) {
+
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + TOKEN_VALIDITY);
+        Date expiration =
+                new Date(now.getTime() + TOKEN_VALIDITY);
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiration)
-                .signWith(SignatureAlgorithm.HS512, secret.getBytes(StandardCharsets.UTF_8))
+                .signWith(
+                        new SecretKeySpec(
+                                Base64.getDecoder().decode(secret),
+                                SignatureAlgorithm.HS512.getJcaName()
+                        )
+                )
                 .compact();
     }
 
-    // Validar token
-    public boolean validateToken(String token, UserDetails userDetails) {
-        return getUsernameFromToken(token).equals(userDetails.getUsername())
+    public boolean validateToken(
+            String token,
+            UserDetails userDetails
+    ) {
+        return getUsernameFromToken(token)
+                .equals(userDetails.getUsername())
                 && !isExpired(token);
     }
 }
