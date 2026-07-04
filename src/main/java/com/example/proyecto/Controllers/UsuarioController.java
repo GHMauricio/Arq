@@ -20,7 +20,7 @@ public class UsuarioController {
     private IUsuarioService uS;
 
     @GetMapping("/listar")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public List<UsuarioDTO> listar() {
         return uS.listar();
     }
@@ -36,7 +36,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<UsuarioDTO> obtenerUsuario(@PathVariable("id") Long id) {
         try {
             UsuarioDTO dto = uS.listarId(id);
@@ -47,7 +47,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/Registrar")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> registroUsuario(@RequestBody UsuarioRegistroDTO dto) {
         if (dto.getCorreoUsuario() == null || !dto.getCorreoUsuario().contains("@")) {
             return ResponseEntity.badRequest().body("El correo debe contener un '@'");
@@ -69,7 +69,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificarUsuario(@PathVariable Long id, @RequestBody UsuarioRegistroDTO dto) {
         if (dto.getCorreoUsuario() == null || !dto.getCorreoUsuario().contains("@")) {
             return ResponseEntity.badRequest().body("El correo debe contener un '@'");
@@ -92,7 +92,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<String> eliminarUsuario(@PathVariable Long id) {
         // Solo el ADMINISTRADOR puede eliminar usuarios del sistema
         try {
