@@ -30,19 +30,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         final String requestTokenHeader = request.getHeader("Authorization");
         String username = null;
         String jwtToken = null;
-
+        // JWT Token is in the form "Bearer token". Remove Bearer word and get
+        // only the Token
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
-
-            // 🔎 Depuración: imprime el token recibido
-            System.out.println("Token recibido en header: " + jwtToken);
-
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-
-                // 🔎 Depuración: imprime el username extraído del token
-                System.out.println("Username extraído del token: " + username);
-
             } catch (IllegalArgumentException e) {
                 System.out.println("No se puede encontrar el token JWT");
             } catch (ExpiredJwtException e) {
@@ -50,27 +43,31 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         } else {
             logger.warn("JWT Token no inicia con la palabra Bearer");
-            System.out.println("Header recibido: " + requestTokenHeader);
+            System.out.println(requestTokenHeader);
         }
 
+
+        // Once we get the token validate it.
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
             UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
 
+            // if token is valid configure Spring Security to manually set
+            // authentication
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
+
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
+                // After setting the Authentication in the context, we specify
+                // that the current user is authenticated. So it passes the
+                // Spring Security Configurations successfully.
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
-                // 🔎 Depuración: confirmación de autenticación
-                System.out.println("✅ Token válido, usuario autenticado: " + username);
-            } else {
-                System.out.println("❌ Token inválido para usuario: " + username);
             }
         }
         chain.doFilter(request, response);
     }
+
+
 }
