@@ -61,6 +61,13 @@ public class EntrevistaServiceImplement implements IEntrevistaService {
     }
 
     @Override
+    public EntrevistaDTO listarId(Long idEntrevista) {
+        return eR.findById(idEntrevista)
+                .map(this::entityToDto)
+                .orElse(null);
+    }
+    
+    @Override
     public List<EntrevistaDTO> listarPorRecomendacion(Long idRecomendacion) {
         return eR.findByRecomendacionIdRecomendacion(idRecomendacion).stream()
                 .map(this::entityToDto)
