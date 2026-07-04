@@ -19,7 +19,7 @@ public class EntrevistaController {
     private IEntrevistaService eS;
 
     @PostMapping("/registrar")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> registrar(@RequestBody EntrevistaDTO dto) {
         if (dto.getFechaEntrevista() == null) {
             return ResponseEntity.badRequest().body("La fecha de la entrevista no puede ser nula");
@@ -40,7 +40,7 @@ public class EntrevistaController {
     }
 
     @GetMapping("/listar")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> listar() {
         try {
             return ResponseEntity.ok(eS.listar());
@@ -50,7 +50,7 @@ public class EntrevistaController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<EntrevistaDTO> obtenerEntrevista(@PathVariable("id") Long id) {
         try {
             EntrevistaDTO dto = eS.listarId(id);
@@ -71,7 +71,7 @@ public class EntrevistaController {
     }
 
     @GetMapping("/tema/{temaEntrevista}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
     public ResponseEntity<?> listarPorTema(@PathVariable String temaEntrevista) {
         List<EntrevistaDTO> lista = eS.listarPorTema(temaEntrevista);
         if (lista.isEmpty()) {
@@ -81,8 +81,8 @@ public class EntrevistaController {
         return ResponseEntity.ok(lista);
     }
 
-    @PutMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PutMapping("/{id}")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> modificar(@RequestBody EntrevistaDTO dto) {
         if (dto.getIdEntrevista() == null) {
             return ResponseEntity.badRequest().body("El id de la entrevista no puede estar vacío");
