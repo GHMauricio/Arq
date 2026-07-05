@@ -11,5 +11,7 @@ public interface IDetalleTestService {
     List<DetalleTestDTO> listar();
     List<DetalleTestDTO> listarPorTest(Long idTest);
     List<DetalleTestDTO> listarPorRespuesta(String respuesta);
+    Long contarDetallesTest();
+    List<Object[]> contarDetallesPorTest();
     void eliminar(Long id);
 }

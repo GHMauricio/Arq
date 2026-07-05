@@ -83,6 +83,16 @@ public class TestServiceImplement implements ITestService {
     }
 
     @Override
+    public Long contarTests() {
+        return tR.contarTests();
+    }
+
+    @Override
+    public List<Object[]> contarTestsPorUsuario() {
+        return tR.contarTestsPorUsuario();
+    }
+
+    @Override
     @Transactional
     public void eliminar(Long id) {
         if (tR.existsById(id)) {

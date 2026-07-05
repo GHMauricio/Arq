@@ -17,4 +17,10 @@ public interface DetalleTestRepository extends JpaRepository<DetallesTest, Long>
     List<DetallesTest> listarPorRespuesta(@Param("respuesta") String respuesta);
 
     void deleteByTestIdTest(Long idTest);
+
+    @Query("SELECT COUNT(d) FROM DetallesTest d")
+    Long contarDetallesTest();
+
+    @Query("SELECT d.test.idTest, d.test.estadoEmocional, COUNT(d) FROM DetallesTest d GROUP BY d.test.idTest, d.test.estadoEmocional")
+    List<Object[]> contarDetallesPorTest();
 }

@@ -1,6 +1,7 @@
 package com.example.proyecto.Controllers;
 
 import com.example.proyecto.DTOs.TestDTO;
+import com.example.proyecto.DTOs.QuantityTestByUsuarioDTO;
 import com.example.proyecto.Servicesinterfaces.ITestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -54,6 +56,34 @@ public class TestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay tests registrados");
         }
         return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/cantidad")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    public ResponseEntity<Long> contarTests() {
+        return ResponseEntity.ok(tS.contarTests());
+    }
+
+    @GetMapping("/conteo-por-usuario")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    public ResponseEntity<?> listarConteoPorUsuario() {
+        List<Object[]> lista = tS.contarTestsPorUsuario();
+
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay registros");
+        }
+
+        List<QuantityTestByUsuarioDTO> respuesta = new ArrayList<>();
+
+        for (Object[] fila : lista) {
+            QuantityTestByUsuarioDTO dto = new QuantityTestByUsuarioDTO();
+            dto.setIdUsuario(((Number) fila[0]).longValue());
+            dto.setNombreUsuario((String) fila[1]);
+            dto.setCantidadTest(((Number) fila[2]).longValue());
+            respuesta.add(dto);
+        }
+
+        return ResponseEntity.ok(respuesta);
     }
 
     @GetMapping("/Usuario/{idUsuario}")
