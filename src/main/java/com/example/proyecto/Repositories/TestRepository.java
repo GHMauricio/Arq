@@ -14,4 +14,10 @@ public interface TestRepository extends JpaRepository<Test, Long> {
 
     @Query("SELECT t FROM Test t ORDER BY t.puntajeTest ASC")
     List<Test> listarPorPuntajeAscendente();
+
+    @Query("SELECT COUNT(t) FROM Test t")
+    Long contarTests();
+
+    @Query("SELECT t.usuario.idUsuario, t.usuario.nombreUsuario, COUNT(t) FROM Test t GROUP BY t.usuario.idUsuario, t.usuario.nombreUsuario")
+    List<Object[]> contarTestsPorUsuario();
 }

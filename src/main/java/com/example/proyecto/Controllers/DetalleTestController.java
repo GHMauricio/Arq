@@ -1,6 +1,7 @@
 package com.example.proyecto.Controllers;
 
 import com.example.proyecto.DTOs.DetalleTestDTO;
+import com.example.proyecto.DTOs.QuantityDetalleByTestDTO;
 import com.example.proyecto.Servicesinterfaces.IDetalleTestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -47,6 +49,34 @@ public class DetalleTestController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/cantidad")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    public ResponseEntity<Long> contarDetallesTest() {
+        return ResponseEntity.ok(dtS.contarDetallesTest());
+    }
+
+    @GetMapping("/conteo-por-test")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'PADRE')")
+    public ResponseEntity<?> listarConteoPorTest() {
+        List<Object[]> lista = dtS.contarDetallesPorTest();
+
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay registros");
+        }
+
+        List<QuantityDetalleByTestDTO> respuesta = new ArrayList<>();
+
+        for (Object[] fila : lista) {
+            QuantityDetalleByTestDTO dto = new QuantityDetalleByTestDTO();
+            dto.setIdTest(((Number) fila[0]).longValue());
+            dto.setEstadoEmocional((String) fila[1]);
+            dto.setCantidadDetalle(((Number) fila[2]).longValue());
+            respuesta.add(dto);
+        }
+
+        return ResponseEntity.ok(respuesta);
     }
 
     @GetMapping("/Test/{idTest}")

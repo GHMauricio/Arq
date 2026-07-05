@@ -75,6 +75,16 @@ public class DetalleTestServiceImplement implements IDetalleTestService {
     }
 
     @Override
+    public Long contarDetallesTest() {
+        return dtR.contarDetallesTest();
+    }
+
+    @Override
+    public List<Object[]> contarDetallesPorTest() {
+        return dtR.contarDetallesPorTest();
+    }
+
+    @Override
     public void eliminar(Long id) {
         if (dtR.existsById(id)) {
             dtR.deleteById(id);

@@ -9,5 +9,7 @@ public interface ITestService {
     List<TestDTO> listar();
     List<TestDTO> listarPorUsuario(Long idUsuario);
     List<TestDTO> listarPorPuntajeAscendente();
+    Long contarTests();
+    List<Object[]> contarTestsPorUsuario();
     void eliminar(Long id);
 }
