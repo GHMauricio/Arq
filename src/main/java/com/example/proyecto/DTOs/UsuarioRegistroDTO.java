@@ -12,6 +12,7 @@ public class UsuarioRegistroDTO {
     private String contrasenaUsuario;
     private String rolUsuario;
     private LocalDate fechaRegistro;
+     private Boolean enabled;
     private LocalDate nacimientoUsuario;
     private LocalDate nacimientoAdolescente;
     private String generoAdolescente;
