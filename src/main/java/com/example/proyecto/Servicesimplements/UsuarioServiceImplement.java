@@ -159,6 +159,27 @@ public class UsuarioServiceImplement implements IUsuarioService {
     }
 
     @Override
+    public List<UsuarioAnioDTO> contabilizarAdolescentesPorAnio() {
+        List<Object[]> resultadoNativo = uR.contabilizarAdolescentesPorAnio();
+        return resultadoNativo.stream().map(row -> {            
+            Integer anio = ((Number) row[0]).intValue();
+            Long cantidad = ((Number) row[1]).longValue();
+            return new UsuarioAnioDTO(anio, cantidad);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UsuarioGeneroDTO> contabilizarUsuariosPorGenero() {
+        List<Object[]> resultadoNativo = uR.contabilizarUsuariosPorGenero();
+
+        return resultadoNativo.stream().map(row -> {            
+            String genero = (String) row[0];
+            Long cantidad = ((Number) row[1]).longValue();
+            return new UsuarioGeneroDTO(genero, cantidad);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
     public List<Usuario> buscarPorIntereses(String intereses) {
         return List.of();
     }

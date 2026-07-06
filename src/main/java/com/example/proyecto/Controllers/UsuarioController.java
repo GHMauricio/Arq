@@ -25,10 +25,20 @@ public class UsuarioController {
         return uS.listar();
     }
 
-    @GetMapping("/nacimiento-adolescente-ascendente")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<?> listarPorNacimientoAdolescenteAscendente() {
-        List<UsuarioDTO> lista = uS.listarPorNacimientoAdolescenteAscendente();
+    @GetMapping("/ordenar-por-anio")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    public ResponseEntity<?> listarPorNacimientoAdolescente() {
+        List<UsuarioAnioDTO> lista = uS.contabilizarAdolescentesPorAnio();
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay usuarios registrados");
+        }
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/contar-por-genero")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    public ResponseEntity<?> contabilizarUsuariosPorGenero() {
+        List<UsuarioGeneroDTO> lista = uS.contabilizarUsuariosPorGenero();
         if (lista.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay usuarios registrados");
         }

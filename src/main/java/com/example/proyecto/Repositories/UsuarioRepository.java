@@ -14,4 +14,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Query("SELECT u FROM Usuario u ORDER BY u.nacimientoAdolescente ASC")
     List<Usuario> listarPorNacimientoAdolescenteAscendente();
+
+     @Query(value = "SELECT EXTRACT(YEAR FROM nacimiento_adolescente) AS anio, COUNT(*) AS cantidad FROM usuarios GROUP BY EXTRACT(YEAR FROM nacimiento_adolescente) ORDER BY anio ASC", nativeQuery = true)
+    List<Object[]> contabilizarAdolescentesPorAnio();
+
+    @Query(value = "SELECT genero_adolescente AS genero, COUNT(*) AS cantidad FROM usuarios GROUP BY genero_adolescente ORDER BY genero ASC", nativeQuery = true)
+    List<Object[]> contabilizarUsuariosPorGenero();
 }
