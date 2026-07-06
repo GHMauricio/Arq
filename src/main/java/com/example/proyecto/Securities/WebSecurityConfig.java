@@ -63,6 +63,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(req -> req
                         .requestMatchers(
                                 "/login",
+                                "/usuarios-general/Registrar",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
