@@ -14,5 +14,7 @@ public interface IUsuarioService {
     List<UsuarioDTO> listarPorNacimientoAdolescenteAscendente();
     void eliminar(Long idUsuario);
     UsuarioDTO listarId(Long idUsuario);
+    List<UsuarioAnioDTO> contabilizarAdolescentesPorAnio();
+    List<UsuarioGeneroDTO> contabilizarUsuariosPorGenero();
     List<Usuario> buscarPorIntereses(String intereses);
 }
